@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="GO Puntos: el programa de beneficios de CV Dietética. Sumá puntos con cada compra y canjealos por productos del local." />
+  <meta name="theme-color" content="#1F4D3A" />
+  <title>Ofertas | GO Puntos</title>
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body data-layout="app" data-area="cliente" data-nav="ofertas.html">
+  <a href="#contenido" class="skip-link">Saltar al contenido</a>
+  <div class="app">
+    <main class="app__main" id="contenido" tabindex="-1">
+
+      <header class="screen-head">
+        <div>
+          <h1 class="screen-head__title">Ofertas</h1>
+          <p class="screen-head__sub">Esta semana en CV Dietética</p>
+        </div>
+      </header>
+
+      <div id="offer-hero"></div>
+      <ul class="stack" id="offers-list" style="margin-top:var(--sp-4)" aria-busy="true"></ul>
+    </main>
+  </div>
+
+  <!-- Iconos Lucide (se cargan desde internet) -->
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <!-- Scripts compartidos: el orden importa, cada uno usa lo anterior -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/services.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/forms.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/pages/ofertas.js"></script>
+</body>
+</html>

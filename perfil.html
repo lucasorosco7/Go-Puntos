@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="GO Puntos: el programa de beneficios de CV Dietética. Sumá puntos con cada compra y canjealos por productos del local." />
+  <meta name="theme-color" content="#1F4D3A" />
+  <title>Mi perfil | GO Puntos</title>
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body data-layout="app" data-area="cliente" data-nav="puntos.html">
+  <a href="#contenido" class="skip-link">Saltar al contenido</a>
+  <div class="app">
+    <main class="app__main" id="contenido" tabindex="-1">
+
+      <header class="screen-head">
+        <a href="puntos.html" class="icon-btn" aria-label="Volver a mis puntos"><i data-lucide="arrow-left" width="19" height="19" class="ic" aria-hidden="true"></i></a>
+        <h1 class="screen-head__title" style="font-size:var(--fs-xl)">Mi perfil</h1>
+      </header>
+
+      <div id="profile-head"></div>
+
+      <form class="card stack" id="profile-form" novalidate style="gap:var(--sp-4)">
+        <h2>Datos personales</h2>
+        <div data-form-alert></div>
+        <div class="auth-form__pair">
+    <div class="field" data-field="firstName">
+      <label for="firstName" class="field__label">Nombre</label>
+      <div class="field__control">
+        <i data-lucide="user-round" width="18" height="18" class="ic field__icon" aria-hidden="true"></i>
+        <input id="firstName" name="firstName" type="text" class="field__input has-icon" autocomplete="given-name" />
+      </div>
+      <p class="field__error" id="firstName-error" hidden></p>
+    </div>
+    <div class="field" data-field="lastName">
+      <label for="lastName" class="field__label">Apellido</label>
+      <div class="field__control">
+        
+        <input id="lastName" name="lastName" type="text" class="field__input" autocomplete="family-name" />
+      </div>
+      <p class="field__error" id="lastName-error" hidden></p>
+    </div>
+        </div>
+    <div class="field" data-field="email">
+      <label for="email" class="field__label">Email</label>
+      <div class="field__control">
+        <i data-lucide="mail" width="18" height="18" class="ic field__icon" aria-hidden="true"></i>
+        <input id="email" name="email" type="email" class="field__input has-icon" autocomplete="email" />
+      </div>
+      <p class="field__error" id="email-error" hidden></p>
+    </div>
+    <div class="field" data-field="phone">
+      <label for="phone" class="field__label">Teléfono</label>
+      <div class="field__control">
+        <i data-lucide="phone" width="18" height="18" class="ic field__icon" aria-hidden="true"></i>
+        <input id="phone" name="phone" type="tel" class="field__input has-icon" autocomplete="tel" />
+      </div>
+      <p class="field__error" id="phone-error" hidden></p>
+    </div>
+        <button type="submit" class="btn btn--block">Guardar cambios</button>
+      </form>
+
+      <form class="card stack" id="password-form" novalidate style="gap:var(--sp-4);margin-top:var(--sp-4)">
+        <h2>Cambiar contraseña</h2>
+        <div data-form-alert></div>
+    <div class="field" data-field="current">
+      <label for="current" class="field__label">Contraseña actual</label>
+      <div class="field__control">
+        <i data-lucide="lock" width="18" height="18" class="ic field__icon" aria-hidden="true"></i>
+        <input id="current" name="current" type="password" class="field__input has-icon has-action" autocomplete="current-password" />
+        <button type="button" class="field__action" data-toggle-password aria-label="Mostrar contraseña" aria-pressed="false">
+          <span data-eye="open"><i data-lucide="eye" width="18" height="18" class="ic" aria-hidden="true"></i></span>
+          <span data-eye="closed" hidden><i data-lucide="eye-off" width="18" height="18" class="ic" aria-hidden="true"></i></span>
+        </button>
+      </div>
+      <p class="field__error" id="current-error" hidden></p>
+    </div>
+    <div class="field" data-field="password">
+      <label for="password" class="field__label">Nueva contraseña</label>
+      <div class="field__control">
+        <i data-lucide="lock" width="18" height="18" class="ic field__icon" aria-hidden="true"></i>
+        <input id="password" name="password" type="password" class="field__input has-icon has-action" autocomplete="new-password" aria-describedby="password-hint" />
+        <button type="button" class="field__action" data-toggle-password aria-label="Mostrar contraseña" aria-pressed="false">
+          <span data-eye="open"><i data-lucide="eye" width="18" height="18" class="ic" aria-hidden="true"></i></span>
+          <span data-eye="closed" hidden><i data-lucide="eye-off" width="18" height="18" class="ic" aria-hidden="true"></i></span>
+        </button>
+      </div><p class="field__hint" id="password-hint">Mínimo 8 caracteres, con letras y números.</p>
+      <p class="field__error" id="password-error" hidden></p>
+    </div>
+    <div class="field" data-field="confirm">
+      <label for="confirm" class="field__label">Repetí la nueva</label>
+      <div class="field__control">
+        <i data-lucide="lock" width="18" height="18" class="ic field__icon" aria-hidden="true"></i>
+        <input id="confirm" name="confirm" type="password" class="field__input has-icon has-action" autocomplete="new-password" />
+        <button type="button" class="field__action" data-toggle-password aria-label="Mostrar contraseña" aria-pressed="false">
+          <span data-eye="open"><i data-lucide="eye" width="18" height="18" class="ic" aria-hidden="true"></i></span>
+          <span data-eye="closed" hidden><i data-lucide="eye-off" width="18" height="18" class="ic" aria-hidden="true"></i></span>
+        </button>
+      </div>
+      <p class="field__error" id="confirm-error" hidden></p>
+    </div>
+        <button type="submit" class="btn btn--outline btn--block">Actualizar contraseña</button>
+      </form>
+
+      <section class="card" style="margin-top:var(--sp-4)" aria-labelledby="nivel-title">
+        <h2 id="nivel-title" style="margin-bottom:var(--sp-4)">Nivel de fidelización</h2>
+        <div id="tiers"></div>
+      </section>
+
+      <button type="button" class="btn btn--outline btn--block" style="margin-top:var(--sp-5);color:var(--danger)" data-logout>
+        <i data-lucide="log-out" width="18" height="18" class="ic" aria-hidden="true"></i> Cerrar sesión
+      </button>
+    </main>
+  </div>
+
+  <!-- Iconos Lucide (se cargan desde internet) -->
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <!-- Scripts compartidos: el orden importa, cada uno usa lo anterior -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/services.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/forms.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/pages/perfil.js"></script>
+</body>
+</html>

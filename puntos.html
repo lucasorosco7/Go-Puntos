@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="GO Puntos: el programa de beneficios de CV Dietética. Sumá puntos con cada compra y canjealos por productos del local." />
+  <meta name="theme-color" content="#1F4D3A" />
+  <title>Mis puntos | GO Puntos</title>
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body data-layout="app" data-area="cliente" data-nav="puntos.html">
+  <a href="#contenido" class="skip-link">Saltar al contenido</a>
+  <div class="app">
+    <main class="app__main" id="contenido" tabindex="-1">
+
+      <!-- Saludo: el avatar abre el perfil -->
+      <header class="screen-head">
+        <div>
+          <p class="muted">Hola,</p>
+          <h1 class="screen-head__title" data-user-name>&nbsp;</h1>
+        </div>
+        <a href="perfil.html" class="screen-head__end" aria-label="Ir a mi perfil" data-user-avatar></a>
+      </header>
+
+      <!-- Todo lo que sigue lo genera assets/js/pages/puntos.js -->
+      <div id="points-card">
+        <span class="skeleton" style="height:190px;border-radius:28px"></span>
+      </div>
+
+      <a href="codigo.html" class="btn btn--honey btn--hero" style="margin-top:var(--sp-3)">
+        <i data-lucide="qr-code" width="22" height="22" class="ic" aria-hidden="true"></i> Mostrar mi código para sumar
+      </a>
+
+      <section aria-labelledby="canjeables-title">
+        <div class="section-head">
+          <h2 id="canjeables-title">Ya podés canjear</h2>
+          <a href="recompensas.html" class="link">Ver todas <i data-lucide="chevron-right" width="15" height="15" class="ic" aria-hidden="true"></i></a>
+        </div>
+        <div class="rail" id="rail-rewards"></div>
+      </section>
+
+      <section aria-labelledby="oferta-title">
+        <div class="section-head">
+          <h2 id="oferta-title">Oferta de la semana</h2>
+          <a href="ofertas.html" class="link">Ver ofertas <i data-lucide="chevron-right" width="15" height="15" class="ic" aria-hidden="true"></i></a>
+        </div>
+        <div id="featured-offer"></div>
+      </section>
+
+      <section aria-labelledby="mov-title">
+        <div class="section-head">
+          <h2 id="mov-title">Últimos movimientos</h2>
+          <a href="movimientos.html" class="link">Ver todos <i data-lucide="chevron-right" width="15" height="15" class="ic" aria-hidden="true"></i></a>
+        </div>
+        <div class="card" id="last-movements"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Iconos Lucide (se cargan desde internet) -->
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <!-- Scripts compartidos: el orden importa, cada uno usa lo anterior -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/services.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/forms.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/pages/puntos.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+/* =========================================================
+   GO Puntos — Tokens del sistema de diseño
+   Todo valor visual (color, tipografía, espacio, radio, sombra)
+   sale de acá. Si cambia la marca, se cambia en un solo lugar.
+   ========================================================= */
+:root {
+  /* ---------- Color: marca ---------- */
+  --deep:      #102a1e;   /* fondos profundos, menú lateral */
+  --forest:    #1f4d3a;   /* color principal de marca */
+  --forest-2:  #2a6a4f;   /* hover, éxito */
+  --sage:      #dcebd2;   /* verde claro: superficies de apoyo */
+  --sage-2:    #edf4e7;
+  --cream:     #f1efe6;   /* fondo general */
+  --cream-2:   #faf9f4;   /* superficies secundarias */
+  --honey:     #e6a73a;   /* acento cálido: puntos, logros */
+  --honey-2:   #fcefd3;
+  --honey-ink: #8a5a0e;   /* texto sobre fondos miel (contraste AA) */
+  --tomato:    #c2533d;   /* error, puntos descontados */
+  --tomato-2:  #f9e4de;
+  --sky:       #e3eef0;   /* avisos informativos */
+  --sky-ink:   #2c5b66;
+
+  /* ---------- Color: roles semánticos ---------- */
+  --bg:            var(--cream);
+  --surface:       #ffffff;
+  --surface-muted: var(--cream-2);
+  --text:          #15261d;
+  --text-muted:    #66756b;
+  --text-subtle:   #8c988f;
+  --text-inverse:  #f1efe6;
+  --line:          #e7e3d5;
+  --line-soft:     #efece2;
+  --primary:       var(--forest);
+  --primary-hover: var(--forest-2);
+  --danger:        var(--tomato);
+  --focus-ring:    0 0 0 2px var(--bg), 0 0 0 4px var(--honey);
+
+  /* ---------- Tipografía ---------- */
+  --font: 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --fs-xs:   0.75rem;   /* 12 */
+  --fs-sm:   0.8125rem; /* 13 */
+  --fs-base: 0.875rem;  /* 14 */
+  --fs-md:   1rem;      /* 16 */
+  --fs-lg:   1.125rem;  /* 18 */
+  --fs-xl:   1.375rem;  /* 22 */
+  --fs-2xl:  1.6875rem; /* 27 */
+  --fs-3xl:  2.25rem;   /* 36 */
+  --fs-4xl:  3.25rem;   /* 52 */
+  --fs-5xl:  3.875rem;  /* 62 */
+
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-semi:    600;
+
+  /* ---------- Espaciado (base 4px) ---------- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.5rem;
+  --sp-7: 2rem;
+  --sp-8: 3rem;
+  --sp-9: 4rem;
+
+  /* ---------- Radios: cuanto más importante, más redondeado ---------- */
+  --radius-sm:   12px;  /* chips, botones chicos */
+  --radius-md:   16px;  /* campos, miniaturas */
+  --radius-lg:   22px;  /* tarjetas y filas */
+  --radius-xl:   28px;  /* tarjeta de puntos, hojas */
+  --radius-pill: 999px;
+
+  /* ---------- Sombras teñidas de verde (no gris genérico) ---------- */
+  --shadow-sm: 0 1px 2px rgba(16, 42, 30, .05);
+  --shadow-md: 0 1px 2px rgba(16, 42, 30, .05), 0 10px 26px -14px rgba(16, 42, 30, .22);
+  --shadow-lg: 0 2px 4px rgba(16, 42, 30, .06), 0 28px 60px -26px rgba(16, 42, 30, .45);
+
+  /* ---------- Layout ---------- */
+  --content: 560px;   /* ancho de lectura del área del cliente */
+  --wide:    1180px;  /* ancho del área del administrador */
+  --tabbar-h: 74px;
+
+  /* ---------- Movimiento ---------- */
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --dur-fast: 120ms;
+  --dur-base: 220ms;
+  --dur-slow: 400ms;
+}

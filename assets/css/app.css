@@ -1,0 +1,133 @@
+/* =========================================================
+   Área del cliente: pensada primero para el celular.
+   En pantallas grandes el contenido se centra y las pestañas
+   pasan de abajo (barra táctil) a arriba.
+   ========================================================= */
+.app { min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); }
+.app__main {
+  flex: 1; width: 100%; max-width: var(--content);
+  margin-inline: auto; padding: var(--sp-4) var(--sp-5) var(--sp-7);
+}
+.app__main:focus { outline: none; }
+
+/* ---------- Encabezado de pantalla ---------- */
+.screen-head { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-5); }
+.screen-head__title { font-size: var(--fs-2xl); }
+.screen-head__sub { color: var(--text-muted); margin-top: 2px; }
+.screen-head__end { margin-left: auto; display: flex; align-items: center; gap: var(--sp-2); }
+
+.icon-btn {
+  display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0;
+  border-radius: 50%; background: var(--surface); border: 1px solid var(--line); color: var(--text);
+  transition: background-color var(--dur-base);
+}
+.icon-btn:hover { background: var(--sage-2); }
+
+/* ---------- Barra de pestañas ----------
+   Tres secciones: Mis puntos, Recompensas y Ofertas. */
+.tabbar {
+  position: sticky; bottom: 0; z-index: 20;
+  height: var(--tabbar-h); flex-shrink: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  padding: var(--sp-2) var(--sp-3) 0;
+  background: var(--surface); border-top: 1px solid var(--line-soft);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tabbar a {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: var(--fs-xs); color: var(--text-subtle);
+}
+.tabbar a .ic { width: 52px; height: 30px; border-radius: var(--radius-pill); transition: background-color var(--dur-base); }
+.tabbar a:hover .ic { background: var(--cream-2); }
+.tabbar a.is-on { color: var(--forest); font-weight: var(--fw-medium); }
+.tabbar a.is-on .ic { background: var(--sage-2); }
+
+@media (min-width: 720px) {
+  .app { flex-direction: column-reverse; justify-content: flex-end; }
+  .tabbar {
+    position: sticky; top: 0; bottom: auto; height: auto;
+    grid-template-columns: none; grid-auto-flow: column; justify-content: center;
+    gap: var(--sp-2); padding: var(--sp-3);
+    border-top: 0; border-bottom: 1px solid var(--line-soft);
+  }
+  .tabbar a { flex-direction: row; gap: var(--sp-2); padding: 10px 18px; border-radius: var(--radius-pill); font-size: var(--fs-base); }
+  .tabbar a .ic { width: auto; height: auto; background: none !important; }
+  .tabbar a.is-on { background: var(--sage-2); }
+  .app__main { padding-top: var(--sp-6); }
+}
+
+/* ---------- Carrusel horizontal de recompensas cercanas ---------- */
+.rail { display: flex; gap: var(--sp-3); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: var(--sp-2); margin-inline: calc(-1 * var(--sp-5)); padding-inline: var(--sp-5); }
+.rail::-webkit-scrollbar { display: none; }
+.rail { scrollbar-width: none; }
+.mini { width: 140px; flex-shrink: 0; scroll-snap-align: start; background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--radius-lg); padding: var(--sp-2); }
+.mini .art { height: 76px; }
+.mini__name { font-size: var(--fs-sm); font-weight: var(--fw-medium); line-height: 1.3; margin: var(--sp-2) var(--sp-1) 2px; min-height: 34px; }
+.mini__points { font-size: var(--fs-sm); color: var(--forest-2); font-weight: var(--fw-medium); margin-inline: var(--sp-1); }
+
+/* ---------- Ofertas ---------- */
+.offer-hero {
+  position: relative; overflow: hidden;
+  border-radius: var(--radius-xl); padding: var(--sp-5);
+  background: radial-gradient(130% 120% at 100% 0%, #2e7457 0%, var(--forest) 50%, #123424 100%);
+  color: #fff;
+}
+.offer-hero__title { font-size: var(--fs-xl); font-weight: var(--fw-medium); letter-spacing: -.02em; line-height: 1.25; margin: var(--sp-3) 0 var(--sp-1); max-width: 15ch; }
+.offer-hero__date { font-size: var(--fs-sm); color: #b7d3c1; }
+.offer-hero__deco {
+  position: absolute; right: -18px; bottom: -22px; width: 130px; height: 130px;
+  border-radius: 50%; background: rgba(230, 167, 58, .18);
+  display: grid; place-items: center; color: var(--honey);
+}
+.offer { align-items: flex-start; }
+.offer__meta { display: flex; align-items: center; gap: 5px; font-size: var(--fs-xs); color: var(--text-subtle); margin-top: 3px; }
+
+/* ---------- Movimientos ---------- */
+.mov { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) 0; }
+.mov + .mov { border-top: 1px solid var(--line-soft); }
+.mov__icon { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: var(--radius-md); }
+.mov__icon--compra { background: var(--sage-2); color: var(--forest-2); }
+.mov__icon--canje { background: var(--honey-2); color: var(--honey-ink); }
+.mov__icon--bonificacion { background: var(--sky); color: var(--sky-ink); }
+.mov__icon--vencimiento { background: var(--tomato-2); color: var(--danger); }
+.mov__body { flex: 1; min-width: 0; }
+.mov__concept { font-weight: var(--fw-medium); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mov__points { margin-left: auto; font-weight: var(--fw-medium); white-space: nowrap; }
+
+/* ---------- Pantalla del código QR ---------- */
+.qr-screen {
+  min-height: 100dvh; display: flex; flex-direction: column;
+  padding: var(--sp-4) var(--sp-5) var(--sp-7);
+  background: radial-gradient(120% 80% at 50% 0%, #2e7457, #123424 70%);
+  color: #fff;
+}
+.qr-screen__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-6); }
+.qr-screen__head .icon-btn { background: rgba(255, 255, 255, .1); border: 0; color: #fff; }
+.qr-screen__head .icon-btn:hover { background: rgba(255, 255, 255, .18); }
+.qr-card {
+  background: #fff; color: var(--text); border-radius: var(--radius-xl);
+  padding: var(--sp-6) var(--sp-5); text-align: center;
+  width: 100%; max-width: 360px; margin-inline: auto;
+}
+.qr-card__code { font-size: var(--fs-xl); font-weight: var(--fw-medium); letter-spacing: .12em; margin-top: var(--sp-4); }
+.qr-screen__balance { display: flex; align-items: center; justify-content: space-between; max-width: 360px; margin: var(--sp-5) auto 0; padding-inline: var(--sp-2); }
+.qr-screen__tip { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); font-size: var(--fs-sm); color: #b7d3c1; margin-top: auto; padding-top: var(--sp-6); }
+
+/* ---------- Canje confirmado ---------- */
+.done { display: grid; justify-items: center; text-align: center; gap: var(--sp-2); padding-top: var(--sp-7); }
+.done__icon { display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; background: var(--sage); color: var(--forest-2); box-shadow: 0 0 0 12px var(--sage-2); margin-bottom: var(--sp-5); }
+.done__code {
+  width: 100%; background: var(--surface); border: 2px dashed var(--honey);
+  border-radius: var(--radius-lg); padding: var(--sp-5); margin-top: var(--sp-6);
+}
+.done__code b { display: block; font-size: var(--fs-3xl); font-weight: var(--fw-medium); letter-spacing: .08em; margin: var(--sp-1) 0 var(--sp-2); }
+
+/* ---------- Perfil ---------- */
+.profile-head { display: grid; justify-items: center; text-align: center; gap: var(--sp-1); padding: var(--sp-4) 0 var(--sp-6); }
+.tier-step { display: flex; gap: var(--sp-3); }
+.tier-step__rail { display: flex; flex-direction: column; align-items: center; }
+.tier-step__dot { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #efede5; color: var(--text-subtle); }
+.tier-step__dot.is-done { background: var(--forest-2); color: #fff; }
+.tier-step__dot.is-current { background: var(--honey); color: var(--deep); box-shadow: 0 0 0 5px var(--sage-2); }
+.tier-step__line { flex: 1; width: 2px; background: var(--line); margin-top: 4px; min-height: 22px; }
+.tier-step__body { padding-bottom: var(--sp-4); }

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="GO Puntos: el programa de beneficios de CV Dietética. Sumá puntos con cada compra y canjealos por productos del local." />
+  <meta name="theme-color" content="#1F4D3A" />
+  <title>Mi código | GO Puntos</title>
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body data-layout="bare" data-area="cliente">
+  <main class="qr-screen" id="contenido">
+    <div class="qr-screen__head">
+      <a href="puntos.html" class="icon-btn" aria-label="Cerrar"><i data-lucide="x" width="19" height="19" class="ic" aria-hidden="true"></i></a>
+      <span style="font-weight:var(--fw-medium)">Mi código</span>
+      <span style="width:44px"></span>
+    </div>
+    <!-- El QR y los datos los genera assets/js/pages/codigo.js -->
+    <div id="qr-card"></div>
+    <p class="qr-screen__tip"><i data-lucide="sun" width="15" height="15" class="ic" aria-hidden="true"></i> Subí el brillo para que se lea mejor</p>
+  </main>
+
+  <!-- Iconos Lucide (se cargan desde internet) -->
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <!-- Scripts compartidos: el orden importa, cada uno usa lo anterior -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/services.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/forms.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/pages/codigo.js"></script>
+</body>
+</html>
