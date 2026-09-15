@@ -126,3 +126,8 @@ GO.nav = {
     },
   ],
 };
+
+// Obtener la configuración del negocio activo
+GO.getBusiness = function () {
+  return GO.config.business;
+};
