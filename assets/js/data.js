@@ -61,26 +61,30 @@ GO.seed = {
     { id: 12, userId: 124, date: '2026-09-08T12:20:00', type: 'compra', concept: 'Compra en el local', amount: 14000, points: 140, balanceAfter: 1240 },
   ],
 
-  // Ofertas y promociones del local (pestaña "Ofertas").
-  // tag = etiqueta corta; tone = color de la etiqueta.
+  // Ofertas y promociones del negocio.
+  // status permite controlar si una oferta está activa o pausada.
   offers: [
-    { id: 1, featured: true, category: 'almacen', tag: 'Suma x2', tone: 'honey',
+    { id: 1, featured: true, category: 'almacen', tag: 'Suma x2', tone: 'honey', status: 'activa',
       title: 'Puntos dobles en productos a granel',
       description: 'Cada compra a granel suma el doble de puntos.',
       when: 'Del 15 al 20 de septiembre' },
-    { id: 2, category: 'snacks', tag: '20% off', tone: 'honey',
+
+    { id: 2, category: 'snacks', tag: '20% off', tone: 'honey', status: 'activa',
       title: 'Miércoles de frutos secos',
       description: '20% menos en frutos secos a granel.',
       when: 'Todos los miércoles' },
-    { id: 3, category: 'bebidas', tag: '+100 pts', tone: 'green',
+
+    { id: 3, category: 'bebidas', tag: '+100 pts', tone: 'green', status: 'activa',
       title: 'Combo yerba orgánica',
       description: 'Llevando 2 sumás 100 puntos extra.',
       when: 'Hasta el 30 de septiembre' },
-    { id: 4, category: 'almacen', tag: 'Nuevo', tone: 'sky',
+
+    { id: 4, category: 'almacen', tag: 'Nuevo', tone: 'sky', status: 'pausada',
       title: 'Granola recién horneada',
       description: 'Nueva receta con almendras y miel.',
       when: 'Desde el lunes' },
-    { id: 5, category: 'almacen', tag: '15% off', tone: 'honey',
+
+    { id: 5, category: 'almacen', tag: '15% off', tone: 'honey', status: 'activa',
       title: 'Aceite de coco 1 L',
       description: 'Precio especial para socios de GO Puntos.',
       when: 'Hasta agotar stock' },
