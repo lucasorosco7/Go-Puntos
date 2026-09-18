@@ -8,9 +8,12 @@
     `<li>${ui.skeleton('96px', '100%', 'var(--radius-lg)')}</li>`).join('');
 
   GO.offerService.getAll().then((offers) => {
-    const featured = offers.find((o) => o.featured);
-    const rest = offers.filter((o) => o !== featured);
+    // El cliente solo puede visualizar ofertas activas.
+    const activeOffers = offers.filter((o) => o.status === 'activa');
 
+    const featured = activeOffers.find((o) => o.featured);
+    const rest = activeOffers.filter((o) => o !== featured);
+    
     hero.innerHTML = featured ? `
       <section class="offer-hero" aria-label="Oferta destacada">
         <span class="pill" style="background:var(--honey);color:var(--deep)">${ui.icon('sparkles', 13)} ${esc(featured.tag)}</span>
