@@ -12,7 +12,7 @@ GO.config = {
   apiUrl: 'http://localhost:5000/api',
 
   // Reglas del programa (mañana las definirá el backend)
-  PESOS_PER_POINT: 100,
+  PESOS_PER_POINT: 200,
   TIERS: [
     { id: 'bronce', name: 'Bronce', minPoints: 0,    multiplier: 1,    color: '#a8743f' },
     { id: 'plata',  name: 'Plata',  minPoints: 1500, multiplier: 1.25, color: '#9aa7a0' },
