@@ -63,7 +63,13 @@
 .admin-brand { display: flex; align-items: center; gap: var(--sp-3); }
 .admin-brand__name { color: #fff; font-weight: var(--fw-medium); line-height: 1.25; }
 .admin-brand__by { font-size: var(--fs-xs); color: var(--on-dark); }
-.admin-top__end { margin-left: auto; }
+.admin-top__end { margin-left: auto; min-width: 0; }
+/* Aviso del estado del negocio: texto completo en pantallas grandes y corto en el celular */
+.admin-top__end .pill__short { display: none; }
+@media (max-width: 720px) {
+  .admin-top__end .pill__long { display: none; }
+  .admin-top__end .pill__short { display: inline; }
+}
 .admin-side nav ul { display: grid; }
 
 /* Encabezado de página */
@@ -79,8 +85,9 @@
 .grid--stats { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--sp-3); }
 .grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid--main { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start; }
-@media (max-width: 1080px) { .grid--main { grid-template-columns: 1fr; } }
-@media (max-width: 720px) { .grid--2 { grid-template-columns: 1fr; } }
+/* minmax(0, 1fr): una columna sola no se ensancha por su contenido (tablas, barras, textos largos) en el celular */
+@media (max-width: 1080px) { .grid--main { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 720px) { .grid--2 { grid-template-columns: minmax(0, 1fr); } }
 .panel-card { background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--radius-lg); padding: var(--sp-5); min-width: 0; }
 .panel-card__head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-4); }
 .panel-card__head h2 { font-size: var(--fs-md); }

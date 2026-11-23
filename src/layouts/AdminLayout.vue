@@ -62,11 +62,11 @@ const status = computed(() => store.business?.status || null);
 /** Aviso de la barra superior según el estado del negocio. */
 const topPill = computed(() => {
   if (!store.business || status.value === 'activo') return null;
-  if (status.value === 'suspendido') return { tone: 'sky', icon: 'circle-pause', text: 'Negocio suspendido' };
-  if (!auth.isAdmin) return { tone: 'honey', icon: 'hourglass', text: 'Programa todavía no aprobado' };
-  if (status.value === 'rechazado') return { tone: 'danger', icon: 'circle-x', text: 'Solicitud rechazada · Ver motivo', to: { name: 'admin-onboarding' } };
-  if (phase.value === 'revision') return { tone: 'honey', icon: 'hourglass', text: 'Solicitud en revisión' };
-  return { tone: 'honey', icon: 'rocket', text: 'Programa en preparación · Completar y enviar a revisión', to: { name: 'admin-onboarding' } };
+  if (status.value === 'suspendido') return { tone: 'sky', icon: 'circle-pause', text: 'Negocio suspendido', short: 'Suspendido' };
+  if (!auth.isAdmin) return { tone: 'honey', icon: 'hourglass', text: 'Programa todavía no aprobado', short: 'Sin aprobar' };
+  if (status.value === 'rechazado') return { tone: 'danger', icon: 'circle-x', text: 'Solicitud rechazada · Ver motivo', short: 'Ver motivo del rechazo', to: { name: 'admin-onboarding' } };
+  if (phase.value === 'revision') return { tone: 'honey', icon: 'hourglass', text: 'Solicitud en revisión', short: 'En revisión' };
+  return { tone: 'honey', icon: 'rocket', text: 'Programa en preparación · Completar y enviar a revisión', short: 'Completar y enviar', to: { name: 'admin-onboarding' } };
 });
 
 /** Aviso sobre el contenido para estados que limitan la operación. */
@@ -120,7 +120,7 @@ onMounted(() => { store.load().catch(() => { /* la vista muestra su propio error
     <template #top-end>
       <!-- Estado del negocio frente a la plataforma -->
       <component :is="topPill.to ? 'router-link' : 'span'" v-if="topPill" :to="topPill.to" class="pill" :class="`pill--${topPill.tone}`">
-        <BaseIcon :name="topPill.icon" :size="13" /> {{ topPill.text }}
+        <BaseIcon :name="topPill.icon" :size="13" /> <span class="pill__long">{{ topPill.text }}</span><span class="pill__short">{{ topPill.short }}</span>
       </component>
     </template>
 
