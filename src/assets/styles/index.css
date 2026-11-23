@@ -1,0 +1,14 @@
+/*
+  Estilos globales de GO Puntos (migrados sin cambios desde la maqueta HTML).
+  El orden importa: tokens (variables de diseño y paleta por defecto) →
+  base → componentes → pantallas.
+  La paleta de cada negocio reemplaza las variables de tokens.css en
+  tiempo de ejecución (src/theme/theme.js).
+*/
+@import './tokens.css';
+@import './base.css';
+@import './components.css';
+@import './app.css';
+@import './admin.css';
+@import './auth.css';
+@import './landing.css';

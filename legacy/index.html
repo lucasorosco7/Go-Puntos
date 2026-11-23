@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="GO Puntos: el programa de beneficios de CV Dietética. Sumá puntos con cada compra y canjealos por productos del local." />
+  <meta name="theme-color" content="#1F4D3A" />
+  <title>GO Puntos | CV Dietética</title>
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+
+  <link rel="stylesheet" href="assets/css/landing.css" />
+</head>
+<body data-layout="public">
+  <a href="#contenido" class="skip-link">Saltar al contenido</a>
+  <div data-slot="header"></div>
+
+  <main id="contenido">
+    <!-- ================= Hero ================= -->
+    <section class="hero">
+      <div class="container hero__grid">
+        <div class="hero__copy">
+          <h1 class="hero__title">Lo que ya comprás, ahora te devuelve algo.</h1>
+          <p class="hero__lead">
+            GO Puntos es el programa de beneficios de CV Dietética. Por cada $100 que gastás sumás
+            un punto, y los canjeás por productos del local.
+          </p>
+          <div class="hero__ctas">
+            <a href="registro.html" class="btn btn--lg">Crear mi cuenta</a>
+            <a href="login.html" class="btn btn--outline btn--lg">Ya tengo cuenta</a>
+          </div>
+          <ul class="hero__facts" role="list">
+            <li><i data-lucide="check" width="16" height="16" aria-hidden="true"></i> Registro gratis</li>
+            <li><i data-lucide="check" width="16" height="16" aria-hidden="true"></i> 100 puntos de bienvenida</li>
+          </ul>
+        </div>
+
+        <div class="hero__visual">
+          <!-- landing.js inserta aquí el resumen de puntos de ejemplo -->
+          <div id="hero-summary"></div>
+          <div class="hero__notice" aria-hidden="true">
+            <span class="hero__notice-icon"><i data-lucide="circle-plus" width="20" height="20" aria-hidden="true"></i></span>
+            <div>
+              <p class="hero__notice-title">Sumaste 140 puntos</p>
+              <p class="hero__notice-text">Compra de $14.000 en CV Dietética</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Cómo funciona ================= -->
+    <section id="como-funciona" class="section">
+      <div class="container">
+        <div class="section__head">
+          <h2 class="section__title">Así se suman tus puntos</h2>
+          <p class="section__lead">Todo queda registrado en tu cuenta: saldo, compras y canjes, desde el celular.</p>
+        </div>
+        <!-- Es una secuencia real, por eso los pasos van numerados -->
+        <ol class="steps" role="list">
+          <li class="step">
+            <span class="step__number" aria-hidden="true">1</span>
+            <span class="step__icon"><i data-lucide="user-round-plus" width="24" height="24" aria-hidden="true"></i></span>
+            <h3 class="step__title">Creá tu cuenta</h3>
+            <p class="step__text">Desde el celular, en dos minutos. Empezás con 100 puntos de regalo.</p>
+          </li>
+          <li class="step">
+            <span class="step__number" aria-hidden="true">2</span>
+            <span class="step__icon"><i data-lucide="qr-code" width="24" height="24" aria-hidden="true"></i></span>
+            <h3 class="step__title">Mostrá tu código en caja</h3>
+            <p class="step__text">Escaneamos tu QR al pagar y la compra se registra en tu cuenta.</p>
+          </li>
+          <li class="step">
+            <span class="step__number" aria-hidden="true">3</span>
+            <span class="step__icon"><i data-lucide="gift" width="24" height="24" aria-hidden="true"></i></span>
+            <h3 class="step__title">Canjeá lo que quieras</h3>
+            <p class="step__text">Elegís del catálogo y lo retirás en el local con tu código de canje.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ================= Beneficios y niveles ================= -->
+    <section id="beneficios" class="section section--tinted">
+      <div class="container perks">
+        <div>
+          <h2 class="section__title">Cuanto más volvés, más ganás</h2>
+          <p class="section__lead">Tu nivel depende de los puntos que sumaste en total. Canjear no te hace bajar.</p>
+          <ul class="perks__list" role="list">
+            <li><span class="perks__icon" aria-hidden="true"><i data-lucide="leaf" width="20" height="20" aria-hidden="true"></i></span>
+              <div><h3>Premios que sí usás</h3><p>Frutos secos, granola, yerba orgánica y descuentos en tu compra.</p></div></li>
+            <li><span class="perks__icon" aria-hidden="true"><i data-lucide="sparkles" width="20" height="20" aria-hidden="true"></i></span>
+              <div><h3>Semanas de puntos dobles</h3><p>Promociones pensadas para quienes ya son clientes del local.</p></div></li>
+            <li><span class="perks__icon" aria-hidden="true"><i data-lucide="bell-ring" width="20" height="20" aria-hidden="true"></i></span>
+              <div><h3>Avisos antes de que venzan</h3><p>Te avisamos si tus puntos están por vencer para que no los pierdas.</p></div></li>
+          </ul>
+        </div>
+        <!-- landing.js genera los niveles desde GO.config.TIERS -->
+        <ol class="tiers" role="list" aria-label="Niveles del programa" id="tiers"></ol>
+      </div>
+    </section>
+
+    <!-- ================= Recompensas ================= -->
+    <section id="recompensas" class="section">
+      <div class="container">
+        <div class="section__head section__head--row">
+          <div>
+            <h2 class="section__title">Algunas cosas que podés llevarte</h2>
+            <p class="section__lead">El catálogo cambia según la temporada y el stock del local.</p>
+          </div>
+          <a href="login.html" class="btn btn--outline">Ver el catálogo completo</a>
+        </div>
+        <ul class="showcase" role="list" id="showcase" aria-busy="true"></ul>
+      </div>
+    </section>
+
+    <!-- ================= Cierre ================= -->
+    <section class="closing">
+      <div class="container closing__inner">
+        <h2 class="closing__title">Tu próxima compra ya puede sumar.</h2>
+        <a href="registro.html" class="btn btn--honey btn--lg">Crear mi cuenta</a>
+      </div>
+    </section>
+  </main>
+
+  <div data-slot="footer"></div>
+
+  <!-- Iconos Lucide (requiere internet) -->
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <!-- Scripts compartidos: el orden importa, cada uno usa lo definido por los anteriores -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/services.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/forms.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/pages/landing.js"></script>
+</body>
+</html>

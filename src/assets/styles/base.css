@@ -1,0 +1,68 @@
+/* Reset mínimo, tipografía global y utilidades de accesibilidad */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+img, svg { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; }
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; }
+
+h1, h2, h3 { font-weight: var(--fw-medium); letter-spacing: -.02em; line-height: 1.2; }
+h1 { font-size: var(--fs-2xl); }
+h2 { font-size: var(--fs-lg); }
+h3 { font-size: var(--fs-md); }
+p { text-wrap: pretty; }
+
+/* Foco visible sólo con teclado */
+:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+::selection { background: var(--honey-2); }
+
+/* Utilidades */
+.tabular { font-variant-numeric: tabular-nums; }
+.muted { color: var(--text-muted); }
+.subtle { color: var(--text-subtle); }
+.small { font-size: var(--fs-sm); }
+.pos { color: var(--forest-2); font-weight: var(--fw-medium); }
+.neg { color: var(--danger); font-weight: var(--fw-medium); }
+.stack { display: grid; gap: var(--sp-3); }
+[hidden] { display: none !important; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: absolute; left: var(--sp-4); top: -60px; z-index: 100;
+  background: var(--deep); color: var(--text-inverse);
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-sm);
+  transition: top var(--dur-base);
+}
+.skip-link:focus { top: var(--sp-4); }
+
+.container { width: 100%; max-width: var(--wide); margin-inline: auto; padding-inline: var(--sp-5); }
+
+.link {
+  color: var(--primary); font-weight: var(--fw-medium); font-size: var(--fs-sm);
+  display: inline-flex; align-items: center; gap: 2px;
+}
+.link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Respeta a quien pide menos movimiento en su sistema */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
