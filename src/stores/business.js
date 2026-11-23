@@ -2,7 +2,8 @@
  * Store del negocio del panel (contexto staff).
  *
  * Guarda el negocio que se está administrando para que el layout del
- * panel muestre su nombre, logo, estado (borrador / activo) y aplique su
+ * panel muestre su nombre, logo y estado (pendiente, activo, rechazado,
+ * suspendido o bloqueado), el estado de su solicitud de alta y aplique su
  * paleta. Las vistas que editan la configuración llaman a setBusiness()
  * con la respuesta del servicio para que todo se actualice en vivo.
  */
@@ -18,6 +19,8 @@ export const useBusinessStore = defineStore('business', () => {
   const levels = ref([]);
   /** Contadores para menús y avisos: clientes, recompensas, ofertas, desafíos, empleados. */
   const counts = ref({});
+  /** Estado frente a la plataforma: solicitud de alta, motivos y requisitos para enviarla. */
+  const platform = ref(null);
   const error = ref(null);
 
   /** Carga el negocio del contexto activo y aplica su paleta. */
@@ -27,6 +30,7 @@ export const useBusinessStore = defineStore('business', () => {
       business.value = r.business;
       levels.value = r.levels;
       counts.value = r.counts;
+      platform.value = r.platform || null;
       error.value = null;
       applyBusinessTheme(r.business);
       return r;
@@ -34,6 +38,13 @@ export const useBusinessStore = defineStore('business', () => {
       error.value = err;
       throw err;
     }
+  }
+
+  /** Actualiza negocio y estado de plataforma con una respuesta completa ({ business, platform, … }). */
+  function setFull(r) {
+    if (r.platform) platform.value = r.platform;
+    if (r.counts) counts.value = r.counts;
+    setBusiness(r.business);
   }
 
   /** Reemplaza el negocio con la versión guardada (y su paleta). */
@@ -47,8 +58,9 @@ export const useBusinessStore = defineStore('business', () => {
     business.value = null;
     levels.value = [];
     counts.value = {};
+    platform.value = null;
     error.value = null;
   }
 
-  return { business, levels, counts, error, load, setBusiness, clear };
+  return { business, levels, counts, platform, error, load, setBusiness, setFull, clear };
 });

@@ -66,7 +66,7 @@ const year = new Date().getFullYear();
           <li><router-link :to="{ name: 'login' }">Ingresar</router-link></li>
           <li><router-link :to="{ name: 'register' }">Crear cuenta</router-link></li>
           <li><router-link :to="{ name: 'forgot' }">Recuperar contraseña</router-link></li>
-          <li><router-link :to="{ name: 'register-business' }">Crear el programa de mi comercio</router-link></li>
+          <li><router-link :to="{ name: 'register-business' }">Registrar mi comercio (con invitación)</router-link></li>
         </ul>
       </div>
     </div>

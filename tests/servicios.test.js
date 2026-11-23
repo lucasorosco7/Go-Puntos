@@ -69,3 +69,16 @@ test('un empleado no puede acceder a métricas (403)', async () => {
   await loginAs('caja@cvdietetica.com', 'caja1234', 'staff');
   await assert.rejects(S.metricsService.getDashboard('mes'), (e) => e.status === 403);
 });
+
+test('la paleta personalizada se guarda ya validada y el modo es de cada persona', async () => {
+  await loginAs('admin@cvdietetica.com', 'admin1234', 'staff');
+  const r = await S.businessService.update({ paletteId: 'personalizada', customPalette: { name: 'Prueba', primary: '#ffcc00', accent: '#7b2cbf' } });
+  assert.equal(r.business.paletteId, 'personalizada');
+  assert.notEqual(r.business.customPalette.primary, '#ffcc00', 'el amarillo se oscurece para que el texto blanco se lea');
+  await assert.rejects(S.businessService.update({ paletteId: 'inexistente' }), (e) => e.status === 422);
+  const u = await S.authService.updatePreferences({ mode: 'oscuro' });
+  assert.equal(u.preferences.mode, 'oscuro');
+  const again = await S.authService.login({ email: 'admin@cvdietetica.com', password: 'admin1234' });
+  assert.equal(again.user.preferences.mode, 'oscuro');
+  await assert.rejects(S.authService.updatePreferences({ mode: 'rosa' }), (e) => e.status === 422);
+});

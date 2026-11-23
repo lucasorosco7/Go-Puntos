@@ -32,7 +32,12 @@ export function staff(s, S, ctx, roles = ['admin', 'empleado']) {
   if (!ctx.businessId) throw new ServerError('Elegí el negocio con el que querés trabajar.', 409);
   const row = S.staffRow(s, user.id, ctx.businessId);
   if (!row || !roles.includes(S.panelRole(row.role))) throw new ServerError('No tenés permiso para esta acción en este negocio.', 403);
-  return { user, business: S.business(s, ctx.businessId), role: row.role };
+  const business = S.business(s, ctx.businessId);
+  // Un negocio bloqueado por la plataforma pierde el acceso al panel (los datos se conservan)
+  if (business.status === 'bloqueado') {
+    throw new ServerError(`${business.name} fue bloqueado por la administración de GO Puntos y no puede usar el panel.`, 403, { code: 'BUSINESS_BLOCKED', reason: S.statusReasonOf(s, business)?.detail || '' });
+  }
+  return { user, business, role: row.role };
 }
 
 /** Sólo dueño o administrador (configuración y datos sensibles del negocio). */
@@ -51,13 +56,22 @@ export function activeMembership(s, S, ctx) {
   return { user, m, business: S.business(s, m.businessId) };
 }
 
-/** Accesos de una cuenta: paneles por negocio (con su rol) y cantidad de membresías. */
+/**
+ * Accesos de una cuenta:
+ *   staff        paneles por negocio (con su rol y el estado del negocio)
+ *   memberships  cantidad de membresías como cliente
+ *   platform     true si es Superadmin (fila activa en administradores_plataforma)
+ */
 export function accessOf(s, S, user) {
   const order = ['owner', 'admin', 'empleado'];
   return {
     staff: S.staffRolesOf(s, user.id)
-      .map((r) => ({ businessId: r.businessId, role: r.role, businessName: S.business(s, r.businessId).name || 'Mi negocio' }))
+      .map((r) => {
+        const b = S.business(s, r.businessId);
+        return { businessId: r.businessId, role: r.role, businessName: b.name || 'Mi negocio', businessStatus: b.status };
+      })
       .sort((a, b) => order.indexOf(a.role) - order.indexOf(b.role)),
     memberships: s.memberships.filter((m) => m.userId === user.id).length,
+    platform: Boolean(S.platformAdminOf(s, user.id)),
   };
 }

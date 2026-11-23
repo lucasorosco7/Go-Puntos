@@ -24,7 +24,7 @@ export const appConfig = {
 
   // Versión de los datos de prueba. Si cambia su estructura, se sube el número
   // y el navegador vuelve a generarlos (sólo afecta al modo mock).
-  mockDataVersion: 1,
+  mockDataVersion: 2,
 
   // Demora simulada de la "red" en modo mock, para ver los estados de carga.
   mockLatencyMs: 350,

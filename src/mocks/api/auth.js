@@ -27,6 +27,10 @@ export const authApi = {
   /** Valida que la cuenta tenga el contexto pedido y devuelve los accesos actualizados. */
   switchContext: (target) => (s, S, ctx) => {
     const user = me(s, ctx);
+    if (target.type === 'plataforma') {
+      if (!S.platformAdminOf(s, user.id)) throw new S.ServerError('Tu cuenta no administra la plataforma.', 403);
+      return { context: { type: 'plataforma' }, access: accessOf(s, S, user) };
+    }
     if (target.type === 'staff') {
       const row = S.staffRow(s, user.id, target.businessId);
       if (!row) throw new S.ServerError('No tenés un rol en ese negocio.', 403);
@@ -53,15 +57,17 @@ export const authApi = {
     };
   },
 
-  /** Alta de un comercio: crea la cuenta y el negocio en borrador; la cuenta queda como dueña. */
+  /**
+   * Alta de un comercio CON INVITACIÓN (invitaciones_registro).
+   * Crea (o reutiliza) la cuenta, el negocio en estado 'pendiente', el rol de
+   * dueño y la solicitud de alta todavía sin enviar. El negocio no opera con
+   * clientes hasta que el Superadmin apruebe la solicitud.
+   */
   registerBusiness: (data) => (s, S) => {
-    if (emailTaken(s, data.email)) throw new S.ServerError('Ya existe una cuenta con ese email.', 409, { field: 'email' });
-    const user = {
-      id: S.nextId(s, 'users'), firstName: data.firstName.trim(), lastName: data.lastName.trim(),
-      email: data.email.trim(), phone: data.phone.trim(), password: data.password, createdAt: new Date().toISOString(), active: true,
-    };
-    s.users.push(user);
-    const b = S.createBusiness(s, { adminUserId: user.id, name: data.businessName.trim(), category: data.category || 'otro', date: new Date() });
+    const { user, business: b } = S.registerBusinessWithInvitation(s, {
+      token: data.invitationToken, firstName: data.firstName, lastName: data.lastName, email: data.email,
+      phone: data.phone, password: data.password, businessName: data.businessName, category: data.category || 'otro', date: new Date(),
+    });
     return { token: `mock-token-${user.id}`, user: publicUser(user), access: accessOf(s, S, user), business: { id: b.id, name: b.name } };
   },
 
@@ -71,6 +77,15 @@ export const authApi = {
     const email = values.email.trim().toLowerCase();
     if (s.users.some((u) => u.id !== user.id && u.email.toLowerCase() === email)) throw new S.ServerError('Ese email ya lo usa otra cuenta.', 409, { field: 'email' });
     Object.assign(user, { firstName: values.firstName.trim(), lastName: values.lastName.trim(), email: values.email.trim(), phone: values.phone.trim() });
+    return publicUser(user);
+  },
+
+  /** PUT /me/preferences — preferencias de la persona (por ahora, el modo claro/oscuro). */
+  updatePreferences: (values) => (s, S, ctx) => {
+    const user = me(s, ctx);
+    const MODES = ['claro', 'oscuro', 'auto'];
+    if (values.mode !== undefined && !MODES.includes(values.mode)) throw new S.ServerError('Elegí claro, oscuro o automático.', 422, { field: 'mode' });
+    user.preferences = { ...(user.preferences || {}), ...values };
     return publicUser(user);
   },
 

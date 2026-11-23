@@ -33,7 +33,7 @@ const joining = ref(false);
 
 const { data, error, run } = useAsync(async () => {
   const r = await businessService.getPublic(slug.value);
-  previewTheme(r.business.paletteId, r.business.paletteVariant);
+  previewTheme(r.business);
   document.title = `Sumate a ${r.business.name} | GO Puntos`;
   return r;
 });

@@ -42,7 +42,7 @@ const print = () => window.print();
         <li>Si la persona ya usa GO Puntos, se suma a tu negocio con la misma cuenta.</li>
         <li>Si no tiene cuenta, la crea en un minuto{{ b.pointsRule.welcomeBonus ? ` y recibe ${format.points(b.pointsRule.welcomeBonus)} puntos de bienvenida` : '' }}.</li>
       </ul>
-      <BaseAlert v-if="b.status !== 'activo'" tone="info" title="Tu programa está en borrador" text="Activalo para que los clientes puedan sumarse." />
+      <BaseAlert v-if="b.status !== 'activo'" tone="info" title="Tu programa todavía no está activo" text="Los clientes van a poder sumarse con este QR cuando GO Puntos apruebe tu solicitud." />
       <div class="btn-row">
         <button type="button" class="btn" @click="print"><BaseIcon name="printer" :size="17" /> Imprimir cartel</button>
         <a class="btn btn--outline" :href="url" target="_blank" rel="noopener"><BaseIcon name="external-link" :size="16" /> Abrir la página</a>

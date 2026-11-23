@@ -8,7 +8,7 @@
 
 /* ---------- Botones ---------- */
 .btn {
-  --btn-bg: var(--primary); --btn-fg: #fff; --btn-border: transparent;
+  --btn-bg: var(--primary); --btn-fg: var(--on-primary); --btn-border: transparent;
   display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
   min-height: 46px; padding: 0 var(--sp-5);
   border: 1.5px solid var(--btn-border); border-radius: var(--radius-pill);
@@ -28,7 +28,7 @@
 .btn--outline:hover { --btn-bg: var(--sage-2); --btn-border: var(--sage); }
 .btn--ghost { --btn-bg: transparent; --btn-fg: var(--primary); }
 .btn--ghost:hover { --btn-bg: var(--sage-2); }
-.btn--danger { --btn-bg: var(--danger); }
+.btn--danger { --btn-bg: var(--danger); --btn-fg: var(--on-danger); }
 
 .btn--sm { min-height: 38px; padding: 0 var(--sp-4); font-size: var(--fs-sm); }
 .btn--lg { min-height: 56px; padding: 0 var(--sp-6); font-size: var(--fs-md); border-radius: var(--radius-lg); }
@@ -54,7 +54,7 @@
   background: var(--surface); border: 1px solid var(--line);
   color: var(--text-muted); font-size: var(--fs-sm); white-space: nowrap;
 }
-.chip.is-on { background: var(--text); border-color: var(--text); color: #fff; font-weight: var(--fw-medium); }
+.chip.is-on { background: var(--text); border-color: var(--text); color: var(--surface); font-weight: var(--fw-medium); }
 
 .pill {
   display: inline-flex; align-items: center; gap: 5px;
@@ -100,7 +100,7 @@ a.row:hover { border-color: var(--sage); }
 /* ---------- Avatar ---------- */
 .avatar {
   display: inline-grid; place-items: center; flex-shrink: 0;
-  border-radius: 50%; background: var(--sage); color: var(--deep);
+  border-radius: 50%; background: var(--sage); color: var(--text);
   font-weight: var(--fw-medium);
 }
 
@@ -109,10 +109,10 @@ a.row:hover { border-color: var(--sage); }
 .art .ic { position: relative; z-index: 1; }
 .art::before {
   content: ''; position: absolute; width: 70%; aspect-ratio: 1;
-  border-radius: 50%; background: rgba(255, 255, 255, .55);
+  border-radius: 50%; background: var(--art-glow);
 }
 .art--descuentos { background: var(--honey-2); color: var(--honey-ink); }
-.art--snacks     { background: #f3e4d2; color: #8a5a2b; }
+.art--snacks     { background: var(--art-snacks-bg); color: var(--art-snacks-ink); }
 .art--almacen    { background: var(--sage-2); color: var(--forest-2); }
 .art--bebidas    { background: var(--sage); color: var(--deep); }
 
@@ -128,7 +128,7 @@ a.row:hover { border-color: var(--sage); }
 }
 .field__input::placeholder { color: var(--text-subtle); }
 .field__input:hover { border-color: var(--sage); }
-.field__input:focus { outline: none; background: #fff; border-color: var(--forest); box-shadow: 0 0 0 4px var(--sage-2); }
+.field__input:focus { outline: none; background: var(--surface); border-color: var(--forest); box-shadow: 0 0 0 4px var(--sage-2); }
 .field__input.has-icon { padding-left: 46px; }
 .field__input.has-action { padding-right: 52px; }
 .field__icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-subtle); pointer-events: none; }
@@ -140,7 +140,7 @@ a.row:hover { border-color: var(--sage); }
 .field__action:hover { color: var(--primary); background: var(--sage-2); }
 .field__hint { font-size: var(--fs-xs); color: var(--text-muted); }
 .field__error { font-size: var(--fs-sm); color: var(--danger); font-weight: var(--fw-medium); }
-.has-error .field__input { border-color: var(--danger); background: #fffaf9; }
+.has-error .field__input { border-color: var(--danger); background: var(--error-bg); }
 .has-error .field__input:focus { box-shadow: 0 0 0 4px var(--tomato-2); }
 
 .checkbox { display: inline-flex; align-items: center; gap: var(--sp-2); cursor: pointer; min-height: 44px; }
@@ -150,7 +150,7 @@ a.row:hover { border-color: var(--sage); }
   border: 1.5px solid var(--line); border-radius: 7px; background: var(--surface);
   color: transparent; transition: all var(--dur-base);
 }
-.checkbox__input:checked + .checkbox__box { background: var(--forest); border-color: var(--forest); color: #fff; }
+.checkbox__input:checked + .checkbox__box { background: var(--forest); border-color: var(--forest); color: var(--on-primary); }
 .checkbox__input:focus-visible + .checkbox__box { box-shadow: var(--focus-ring); }
 
 /* Selector de dos opciones (segmented control) */
@@ -159,7 +159,7 @@ a.row:hover { border-color: var(--sage); }
   padding: 9px 14px; border-radius: var(--radius-pill);
   font-size: var(--fs-sm); color: var(--text-muted); transition: all var(--dur-base);
 }
-.seg button.is-on { background: #fff; color: var(--text); font-weight: var(--fw-medium); box-shadow: var(--shadow-sm); }
+.seg button.is-on { background: var(--surface); color: var(--text); font-weight: var(--fw-medium); box-shadow: var(--shadow-sm); }
 
 /* ---------- Avisos ---------- */
 .alert {
@@ -234,7 +234,7 @@ a.row:hover { border-color: var(--sage); }
 /* ---------- Tarjeta de puntos (la pieza principal) ---------- */
 .points {
   border-radius: var(--radius-xl); padding: var(--sp-5);
-  background: radial-gradient(130% 120% at 100% 0%, var(--grad-a) 0%, var(--forest) 50%, var(--grad-b) 100%);
+  background: radial-gradient(130% 120% at 100% 0%, var(--grad-a) 0%, var(--brand) 50%, var(--grad-b) 100%);
   color: #fff;
 }
 .points__label { font-size: var(--fs-base); color: var(--on-dark); }
@@ -275,7 +275,7 @@ a.row:hover { border-color: var(--sage); }
 
 /* ---------- Logo del negocio ---------- */
 .biz-logo { flex-shrink: 0; object-fit: cover; background: var(--surface); }
-.biz-logo--mono { display: inline-grid; place-items: center; background: var(--forest); color: var(--honey); }
+.biz-logo--mono { display: inline-grid; place-items: center; background: var(--brand); color: var(--honey); }
 
 /* ---------- Insignia de nivel ---------- */
 .level-badge {
@@ -376,7 +376,7 @@ a.row:hover { border-color: var(--sage); }
 .bell__count {
   position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px; padding: 0 5px;
   display: grid; place-items: center; border-radius: var(--radius-pill);
-  background: var(--danger); color: #fff; font-size: 11px; font-weight: var(--fw-medium);
+  background: var(--danger); color: var(--on-danger); font-size: 11px; font-weight: var(--fw-medium);
   box-shadow: 0 0 0 2px var(--bg);
 }
 

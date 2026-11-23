@@ -1,45 +1,61 @@
 /**
- * Prueba de contraste de las paletas prediseñadas (WCAG 2.1).
+ * Prueba de contraste de las paletas (WCAG 2.1), en modo claro y oscuro.
  *
  * Cada combinación de texto y fondo que usa la interfaz debe alcanzar el
- * contraste mínimo, en todas las paletas y variantes. Si se agrega o se
- * modifica una paleta, esta prueba avisa si algún color no es legible.
+ * contraste mínimo (lista única en src/theme/checks.js):
+ *   - en todas las paletas prediseñadas y sus variantes;
+ *   - en el modo oscuro derivado de cada una;
+ *   - en paletas personalizadas creadas con colores cualesquiera (el
+ *     generador tiene que ajustarlas hasta que sean legibles).
  */
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { PALETTES } from '../src/theme/palettes.js';
+import { test } from 'node:test';
+import { darkChecks, lightChecks } from '../src/theme/checks.js';
+import { darkTokens } from '../src/theme/darkMode.js';
+import { buildCustomPalette } from '../src/theme/paletteBuilder.js';
+import { PALETTES, paletteVars } from '../src/theme/palettes.js';
 
-/** Luminancia relativa de un color hexadecimal (fórmula WCAG). */
-const lum = (hex) => {
-  const c = hex.replace('#', '').match(/../g).map((h) => parseInt(h, 16) / 255)
-    .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
-  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
-};
-const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+const fallas = (checks) => checks.filter((c) => !c.ok).map((c) => `${c.label}: ${c.ratio} < ${c.min}`);
 
 for (const p of PALETTES) {
   for (const v of p.variants) {
-    test(`paleta ${p.name} / ${v.name}`, () => {
-      const b = p.base;
-      const checks = [
-        ['Texto blanco sobre botón', '#ffffff', b.primary, 4.5],
-        ['Texto blanco sobre hover', '#ffffff', b.hover, 4.5],
-        ['Texto sobre botón de acento', b.deep, v.accent, 4.5],
-        ['Etiqueta de acento', v.accentInk, v.accentSoft, 4.5],
-        ['Texto de acento sobre blanco', v.accentInk, '#ffffff', 4.5],
-        ['Etiqueta de marca', b.primary, b.soft2, 4.5],
-        ['Texto positivo sobre blanco', b.hover, '#ffffff', 4.5],
-        ['Texto principal sobre fondo', b.text, b.bg, 7],
-        ['Texto secundario sobre fondo', b.textMuted, b.bg, 4.5],
-        ['Texto secundario sobre tarjeta', b.textMuted, '#ffffff', 4.5],
-        ['Texto tenue sobre tarjeta', b.textSubtle, '#ffffff', 3],
-        ['Texto claro sobre tarjeta de puntos', b.onDark, b.primary, 4.5],
-        ['Texto claro sobre degradé oscuro', b.onDarkSoft, b.gradA, 3],
-        ['Blanco sobre fondo profundo', '#ffffff', b.deep, 7],
-      ];
-      for (const [label, fg, bg, min] of checks) {
-        assert.ok(ratio(fg, bg) >= min, `${label}: ${ratio(fg, bg).toFixed(2)} < ${min}`);
-      }
+    test(`paleta ${p.name} / ${v.name}: modo claro`, () => {
+      assert.deepEqual(fallas(lightChecks(p.base, v)), []);
+    });
+    test(`paleta ${p.name} / ${v.name}: modo oscuro`, () => {
+      assert.deepEqual(fallas(darkChecks(darkTokens(p.base, v))), []);
     });
   }
 }
+
+test('paleta personalizada: cualquier par de colores termina siendo legible en claro y oscuro', () => {
+  // Generador pseudoaleatorio con semilla fija: la prueba siempre usa los mismos colores
+  let seed = 12345;
+  const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed; };
+  const color = () => `#${(rnd() & 0xffffff).toString(16).padStart(6, '0')}`;
+  const extremos = [['#ffffff', '#ffffff'], ['#000000', '#000000'], ['#ffff00', '#00ffff'], ['#ff0000', '#00ff00']];
+  const pares = [...extremos, ...Array.from({ length: 300 }, () => [color(), color()])];
+  for (const [primary, accent] of pares) {
+    const r = buildCustomPalette({ primary, accent });
+    assert.deepEqual(fallas(r.checks), [], `claro ${primary} / ${accent}`);
+    assert.deepEqual(fallas(darkChecks(darkTokens(r.palette.base, r.variant))), [], `oscuro ${primary} / ${accent}`);
+  }
+});
+
+test('paleta personalizada: avisa cuando ajusta un color y no toca los que ya sirven', () => {
+  const claro = buildCustomPalette({ primary: '#ffcc00', accent: '#e6a73a' });
+  assert.ok(claro.adjustments.some((a) => a.includes('color principal')));
+  const bien = buildCustomPalette({ primary: '#1f4d3a', accent: '#e6a73a' });
+  assert.equal(bien.palette.base.primary, '#1f4d3a');
+  assert.equal(bien.variant.accent, '#e6a73a');
+});
+
+test('paletteVars entrega los mismos tokens en claro y en oscuro', () => {
+  const claro = paletteVars('bosque', 'miel');
+  const oscuro = paletteVars('bosque', 'miel', { mode: 'oscuro' });
+  assert.deepEqual(Object.keys(claro).sort(), Object.keys(oscuro).sort());
+  assert.equal(claro['color-scheme'], 'light');
+  assert.equal(oscuro['color-scheme'], 'dark');
+  const custom = paletteVars('personalizada', 'propia', { custom: { primary: '#7b2cbf', accent: '#ffb703' } });
+  assert.notEqual(custom['--forest'], claro['--forest']);
+});

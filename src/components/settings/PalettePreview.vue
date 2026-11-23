@@ -1,7 +1,7 @@
 <!--
-  Vista previa de la app del cliente con una paleta (antes de aplicarla).
-  Usa paletteStyle(): las variables de color se aplican sólo dentro de
-  esta tarjeta, el resto del panel no cambia hasta guardar.
+  Vista previa de la app del cliente con una paleta (antes de aplicarla),
+  en modo claro u oscuro. Usa paletteStyle(): las variables de color se
+  aplican sólo dentro de esta tarjeta, el resto del panel no cambia hasta guardar.
 -->
 <script setup>
 import { computed } from 'vue';
@@ -17,9 +17,13 @@ const props = defineProps({
   paletteId: { type: String, required: true },
   variantId: { type: String, required: true },
   levels: { type: Array, default: () => [] },
+  /** Colores de la paleta personalizada (si paletteId = 'personalizada'). */
+  custom: { type: Object, default: null },
+  /** 'claro' | 'oscuro' */
+  mode: { type: String, default: 'claro' },
 });
 const level = computed(() => props.levels[1] || props.levels[0] || { name: 'Plata', icon: 'award', color: 'plata' });
-const style = computed(() => paletteStyle(props.paletteId, props.variantId));
+const style = computed(() => paletteStyle(props.paletteId, props.variantId, { custom: props.custom, mode: props.mode }));
 </script>
 
 <template>

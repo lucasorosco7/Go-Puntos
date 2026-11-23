@@ -8,6 +8,7 @@
  *   notificaciones se abren desde estas pantallas para no llenar el menú.
  * - ADMIN_MENU: menú lateral del panel. "roles" indica qué rol del
  *   personal del negocio ve cada opción (el empleado sólo opera la Caja).
+ * - PLATFORM_MENU: menú lateral del panel de la plataforma (Superadmin).
  */
 
 export const APP_LINKS = {
@@ -46,4 +47,15 @@ export const ADMIN_MENU = [
   { to: { name: 'admin-settings', params: { section: 'negocio' } }, label: 'Configuración', icon: 'settings', roles: OWNER_ADMIN, match: 'admin-settings' },
   { to: { name: 'admin-settings', params: { section: 'identidad' } }, label: 'Personalización', icon: 'palette', roles: OWNER_ADMIN, match: 'admin-settings:identidad' },
   { to: { name: 'admin-settings', params: { section: 'empleados' } }, label: 'Empleados', icon: 'id-card', roles: OWNER_ADMIN, match: 'admin-settings:empleados' },
+];
+
+/** Menú del panel de la plataforma (Superadmin). "badge" indica qué contador mostrar. */
+export const PLATFORM_MENU = [
+  { group: 'Plataforma' },
+  { to: { name: 'platform-dashboard' }, label: 'Dashboard', icon: 'chart-column' },
+  { to: { name: 'platform-requests' }, label: 'Solicitudes', icon: 'clipboard-list', badge: 'requestsToReview' },
+  { to: { name: 'platform-businesses' }, label: 'Negocios', icon: 'building-2' },
+  { group: 'Accesos' },
+  { to: { name: 'platform-invitations' }, label: 'Invitaciones', icon: 'mail-plus' },
+  { to: { name: 'platform-audit' }, label: 'Auditoría', icon: 'scroll-text' },
 ];

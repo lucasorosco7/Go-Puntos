@@ -87,18 +87,18 @@ const setup = computed(() => {
 
     <ChipTabs :model-value="range" :items="Object.entries(METRIC_RANGES)" label="Período" @update:model-value="setRange" />
 
-    <!-- Indicadores -->
+    <!-- Indicadores, agrupados por color: clientes (info), ventas (marca), puntos y recompensas (acento) -->
     <div class="grid grid--stats" :style="loading ? { opacity: 0.6 } : undefined">
-      <StatTile label="Clientes activos" :value="format.points(k.activeCustomers)" icon="users" :hint="`de ${format.points(k.totalCustomers)} clientes`" />
-      <StatTile label="Nuevos clientes" :value="format.points(k.newCustomers)" icon="user-plus" />
-      <StatTile label="Compras registradas" :value="format.points(k.purchases)" icon="shopping-bag" :hint="k.purchases ? `Ticket promedio ${format.currency(k.avgTicket)}` : ''" />
-      <StatTile label="Facturación registrada" :value="format.currency(k.revenue)" icon="banknote" />
-      <StatTile label="Puntos otorgados" :value="format.points(k.pointsIssued)" icon="leaf" />
-      <StatTile label="Puntos canjeados" :value="format.points(k.pointsRedeemed)" icon="gift" :hint="`Tasa de canje ${format.percent(k.redemptionRate)}`" />
-      <StatTile label="Recompensas canjeadas" :value="format.points(k.redemptions)" icon="package" :hint="d.pendingRedemptions ? `${d.pendingRedemptions} para entregar` : ''" />
-      <StatTile label="Clientes que regresaron" :value="format.points(k.returning)" icon="repeat" :hint="k.activeCustomers ? `${format.percent(k.returningRate)} de los activos` : ''" />
-      <StatTile label="Nivel más frecuente" :value="d.topLevel ? d.topLevel.name : '—'" icon="medal" />
-      <StatTile label="Desafíos completados" :value="format.points(k.challengesCompleted)" icon="target" :hint="`${d.liveChallenges} activos`" />
+      <StatTile tone="info" label="Clientes activos" :value="format.points(k.activeCustomers)" icon="users" :hint="`de ${format.points(k.totalCustomers)} clientes`" />
+      <StatTile tone="info" label="Nuevos clientes" :value="format.points(k.newCustomers)" icon="user-plus" />
+      <StatTile tone="info" label="Clientes que regresaron" :value="format.points(k.returning)" icon="repeat" :hint="k.activeCustomers ? `${format.percent(k.returningRate)} de los activos` : ''" />
+      <StatTile tone="marca" label="Compras registradas" :value="format.points(k.purchases)" icon="shopping-bag" :hint="k.purchases ? `Ticket promedio ${format.currency(k.avgTicket)}` : ''" />
+      <StatTile tone="marca" label="Facturación registrada" :value="format.currency(k.revenue)" icon="banknote" />
+      <StatTile tone="acento" label="Puntos otorgados" :value="format.points(k.pointsIssued)" icon="leaf" />
+      <StatTile tone="acento" label="Puntos canjeados" :value="format.points(k.pointsRedeemed)" icon="gift" :hint="`Tasa de canje ${format.percent(k.redemptionRate)}`" />
+      <StatTile tone="acento" label="Recompensas canjeadas" :value="format.points(k.redemptions)" icon="package" :hint="d.pendingRedemptions ? `${d.pendingRedemptions} para entregar` : ''" />
+      <StatTile tone="marca" label="Nivel más frecuente" :value="d.topLevel ? d.topLevel.name : '—'" icon="medal" />
+      <StatTile tone="marca" label="Desafíos completados" :value="format.points(k.challengesCompleted)" icon="target" :hint="`${d.liveChallenges} activos`" />
     </div>
 
     <div class="grid grid--main" style="margin-top: var(--sp-4)">

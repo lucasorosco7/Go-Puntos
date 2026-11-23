@@ -18,6 +18,9 @@ Este documento describe las reglas de negocio, el modelo de datos previsto para 
 | **Cierre mensual:** guarda ranking y posiciones, ganador, entrega el premio, guarda para cada cliente el nivel vigente del mes y el **nivel ganado**, aplica ese nivel ganado como vigente del mes siguiente, cierra estadísticas y reinicia **sólo** `period_points`. No borra historial ni toca el saldo. | `closePeriod()` |
 | **Premios de desafíos, premios del ranking, bonificaciones y ajustes** suman sólo al saldo. | `countsForPeriod()` |
 | **Multi-negocio:** todo lo de fidelización cuelga de `membership_id` + `business_id`. Nunca se mezclan. | todas las consultas filtran por negocio |
+| **Superadmin:** administra la plataforma (invitaciones, solicitudes, estado de los negocios, auditoría). Es una fila de `administradores_plataforma`, NO es personal de ningún negocio y no entra a sus paneles. | `src/mocks/server.js → platformAdminOf()` · `src/mocks/api/platform.js → superadmin()` |
+| **Alta de negocios con invitación:** sin invitación vigente no hay registro; el negocio nace `pendiente` y no opera con clientes (compras, canjes, sumarse, campañas, ajustes) hasta que el Superadmin aprueba su solicitud. | `src/domain/platform.js`, `server.js → registerBusinessWithInvitation(), assertOperational()` |
+| **Un rol por persona y negocio** (como `usuarios_negocios`, único por usuario + negocio): un cliente de un negocio no puede ser su empleado y viceversa. La misma cuenta sí puede tener roles distintos en negocios distintos. *Limitación conocida del modelo actual.* | `businesses.js → createEmployee`, `server.js → joinBusiness()` |
 | **Roles:** no están en `users`. Un cliente es una fila de `memberships`; un dueño, administrador o empleado es una fila de `business_staff`. La misma cuenta puede tener ambas cosas en negocios distintos (o en el mismo). | `src/mocks/server.js → addStaff(), staffRow()` · `src/mocks/api/common.js → staff()` |
 | El **progreso de desafíos** no se guarda: se calcula desde los movimientos. Sólo se guarda cuándo se completó (para premiar una vez). | `src/domain/challenges.js`, `challengeCompletions` |
 | Las **rachas** se calculan desde las fechas de compra (semanas lunes a domingo). | `src/domain/streaks.js` |
@@ -27,7 +30,7 @@ Este documento describe las reglas de negocio, el modelo de datos previsto para 
 Tipos pensados para MySQL/PostgreSQL. `id` = entero autoincremental; fechas en ISO 8601 (UTC).
 
 ### users — identidad global (una cuenta por persona)
-`id, first_name, last_name, email (único), phone, password_hash, active, created_at`
+`id, first_name, last_name, email (único), phone, password_hash, active, preferences (JSON: mode 'claro'|'oscuro'|'auto'), created_at`
 **Sin rol ni negocio.** Lo que una persona puede hacer sale de sus filas en `memberships` (como cliente) y en `business_staff` (como dueño, administrador o empleado).
 
 ### business_staff — roles administrativos por negocio
@@ -38,7 +41,7 @@ Tipos pensados para MySQL/PostgreSQL. `id` = entero autoincremental; fechas en I
 Quitar a un empleado borra (o desactiva) su fila acá; su cuenta de `users` y sus membresías de cliente siguen intactas.
 
 ### businesses
-`id, slug (único, va en el QR), code_prefix (único, prefijo de códigos: CV), name, logo_url, logo_icon, description, category, address, city, phone, email, social (JSON), palette_id, palette_variant, points_rule (JSON: pesos, points, rounding, minPurchase, welcomeBonus, applyLevelMultiplier), ranking (JSON: enabled, showTop, showPosition), monthly_prize (JSON: enabled, type, points, rewardId, description), challenges_enabled, streaks (JSON), notifications (JSON por tipo + push), redemption_validity_days, status ('borrador'|'activo'), onboarding (JSON: completed, dismissed, steps), current_period ('AAAA-MM'), created_at`
+`id, slug (único, va en el QR), code_prefix (único, prefijo de códigos: CV), name, logo_url, logo_icon, description, category, address, city, phone, email, social (JSON), palette_id ('bosque'…|'personalizada'), palette_variant, custom_palette (JSON: name, primary, accent — ya validados; el resto de los colores se genera),  points_rule (JSON: pesos, points, rounding, minPurchase, welcomeBonus, applyLevelMultiplier), ranking (JSON: enabled, showTop, showPosition), monthly_prize (JSON: enabled, type, points, rewardId, description), challenges_enabled, streaks (JSON), notifications (JSON por tipo + push), redemption_validity_days, status ('pendiente'|'activo'|'rechazado'|'suspendido'|'bloqueado' — los de `negocios.estado`), onboarding (JSON: completed, dismissed, steps), current_period ('AAAA-MM'), created_at`
 El dueño no es una columna: es la fila `business_staff` con `role = 'owner'`.
 
 > Los campos JSON se pueden normalizar en tablas propias si hace falta consultar por ellos.
@@ -107,10 +110,31 @@ Nombres en castellano acordados para el backend (MySQL/PostgreSQL). La columna "
 | `suscripciones_push` | dispositivos para push (futuro) | — (`pushService` preparado) |
 | `cierres_periodo` | cierre mensual: ganador, premio, estadísticas | `periodCloses` |
 | `ranking_periodo` | posiciones finales de cada mes | `periodCloses.ranking` |
-| `paletas_negocio` | paleta y variante elegidas | `businesses.paletteId / paletteVariant` (las paletas son un catálogo cerrado en `src/theme/palettes.js`) |
+| `paletas_negocio` | paleta y variante elegidas, o la paleta personalizada (nombre + color principal + acento) | `businesses.paletteId / paletteVariant / customPalette` (las prediseñadas son un catálogo cerrado en `src/theme/palettes.js`; la personalizada se genera con `src/theme/paletteBuilder.js`) |
 | `configuraciones_negocio` | ranking, premio, desafíos, rachas, notificaciones | campos JSON de `businesses` |
 | `rachas` | (opcional) caché de rachas; hoy se calculan desde las compras | `src/domain/streaks.js` |
+| `preferencias_usuario` (o campo JSON en `usuarios`) | modo claro / oscuro / automático de cada persona | `users.preferences` |
 | `progreso_configuracion` | pasos del asistente inicial | `businesses.onboarding` |
+
+## 2 ter. Administración de la plataforma (Superadmin)
+
+Corresponde a las 4 tablas nuevas de `go_puntos_v2` (`database/go_puntos_v2.sql`). Los estados son **exactamente** los de sus CHECK; no se agregó ninguno.
+
+| Tabla MySQL | En el simulador | Campos usados |
+|---|---|---|
+| `administradores_plataforma` | `platformAdmins` | `id`, `userId` (id_usuario), `assignedAt` (fecha_asignacion), `status` ('activo' \| 'inactivo') |
+| `invitaciones_registro` | `invitations` | `id`, `adminId` (id_administrador), `tokenHash` (token_hash, **SHA-256 del token**; el token sólo viaja en el enlace y se muestra una vez), `email` (email_destinatario, opcional), `createdAt`, `expiresAt` (fecha_vencimiento), `usedAt` (fecha_uso), `status` ('pendiente' \| 'utilizada' \| 'revocada'). **"Vencida" no se guarda:** es una pendiente con `fecha_vencimiento` pasada (`domain/platform.js → invitationStatus`). |
+| `solicitudes_negocio` | `businessRequests` | `id`, `invitationId`, `userId` (solicitante = dueño), `businessId`, `createdAt` (fecha_solicitud), `status` ('pendiente' \| 'aprobada' \| 'rechazada'), `reviewerId` (id_administrador_revisor), `reviewedAt` (fecha_revision), `reason` (motivo_revision). Una solicitud por negocio y una por invitación (claves únicas del SQL). |
+| `auditoria_plataforma` | `platformAudit` | `id`, `adminId`, `businessId`, `requestId`, `action` (las 7 del CHECK: crear_invitacion, revocar_invitacion, aprobar_negocio, rechazar_negocio, suspender_negocio, bloquear_negocio, reactivar_negocio), `detail` (motivo, hasta 500 caracteres), `date` (fecha_accion). |
+
+**Etapas de una solicitud** (se calculan, no son estados): *en preparación* = `pendiente` sin enviar · *en revisión* = `pendiente` enviada · *aprobada* · *rechazada*. Para saber si el dueño ya la envió, el simulador guarda `submittedAt`. **En el SQL actual no existe esa columna:** la propuesta (pendiente de aprobación, no aplicada) es `solicitudes_negocio.fecha_envio DATETIME NULL` (migración M10 de `docs/PLAN_ETAPA3.md`). Alternativa sin migración: registrar el envío en `auditoria` (auditoría interna del negocio).
+
+**Flujo:** invitación → registro (cuenta + negocio `pendiente` + rol Administrador + solicitud, en una transacción) → configuración → envío a revisión (requiere nombre, regla de puntos, niveles y una recompensa activa) → aprobar (`negocios.estado = 'activo'`) o rechazar con motivo (`'rechazado'`; el dueño corrige y reenvía: la misma solicitud vuelve a `pendiente`).
+
+**Estado de un negocio aprobado:** activo → suspender (motivo) → suspendido · activo/suspendido → bloquear (motivo) → bloqueado · suspendido/bloqueado → reactivar → activo. El motivo de una suspensión o bloqueo se lee de la última fila de `auditoria_plataforma` (no hay columna en `negocios`). Suspendido: el panel abre pero no opera. Bloqueado: el panel no está disponible. En ambos casos los saldos se conservan.
+
+**Dueño:** el SQL no tiene rol "dueño". Se identifica como el solicitante de la solicitud aprobada (`solicitudes_negocio.id_usuario`); su fila en `usuarios_negocios` tiene el rol Administrador.
+
 
 ## 3. Endpoints esperados
 
@@ -118,7 +142,7 @@ Cada archivo de `src/services/` documenta sus endpoints en el encabezado y decla
 
 | Área | Endpoints | Service |
 |---|---|---|
-| Auth | `POST /auth/login` (identidad + `access`: roles por negocio y cantidad de membresías), `POST /auth/context {type:'cliente'} \| {type:'staff', businessId}`, `POST /auth/register`, `POST /auth/register-business`, `POST /auth/forgot-password`, `POST /auth/logout`, `PUT /me`, `PUT /me/password` | `authService` |
+| Auth | `POST /auth/login` (identidad + `access`: roles por negocio, cantidad de membresías y `platform` si es Superadmin), `POST /auth/context {type:'cliente'} \| {type:'staff', businessId} \| {type:'plataforma'}`, `POST /auth/register`, `POST /auth/register-business {…, invitationToken}`, `POST /auth/forgot-password`, `POST /auth/logout`, `PUT /me`, `PUT /me/password`, `PUT /me/preferences {mode}` | `authService` |
 | Cliente | `GET /me/memberships`, `POST /me/memberships {slug}`, `GET /businesses?status=activo`, `GET /me/businesses/:id/dashboard · movements · profile`, `GET /me/movements` | `customerService` |
 | Recompensas | `GET /me/businesses/:id/rewards · redemptions`, `POST /rewards/:id/redeem`, CRUD `/admin/rewards`, `PATCH /admin/rewards/:id/status`, `GET /admin/redemptions`, `GET /staff/redemptions/:code`, `POST /staff/redemptions/:code/validate`, `GET /staff/redemptions?status=pendiente` | `rewardService` |
 | Ofertas | `GET /me/businesses/:id/offers`, CRUD `/admin/offers`, `PATCH /admin/offers/:id/status` | `offerService` |
@@ -128,11 +152,12 @@ Cada archivo de `src/services/` documenta sus endpoints en el encabezado y decla
 | Desafíos | CRUD `/admin/challenges`, `PATCH /admin/challenges/:id/status` | `challengeService` |
 | Campañas | `GET /admin/campaigns`, `POST /admin/campaigns/preview`, `POST /admin/campaigns` | `campaignService` |
 | Notificaciones | `GET /me/notifications`, `GET /me/notifications/unread-count`, `PATCH /me/notifications/:id`, `POST /me/notifications/read-all`, `POST /me/push-subscriptions` | `notificationService`, `pushService` |
-| Negocio | `GET /businesses/:slug/public`, `GET /businesses/:slug/rewards`, `GET/PATCH /business`, `PUT /business/levels`, `PATCH /business/onboarding`, `POST /business/onboarding/dismiss`, `POST /business/activate`, `GET/POST/PATCH/DELETE /business/employees` | `businessService` |
+| Negocio | `GET /businesses/:slug/public`, `GET /businesses/:slug/rewards`, `GET/PATCH /business`, `PUT /business/levels`, `PATCH /business/onboarding`, `POST /business/onboarding/dismiss`, `POST /business/submit-review`, `GET/POST/PATCH/DELETE /business/employees` | `businessService` |
 | Clientes (panel) | `GET /admin/customers[/:id]`, `POST /admin/customers/:id/adjust` | `customerService` |
 | Métricas | `GET /admin/metrics?range=hoy\|semana\|mes\|historico` | `metricsService` |
+| Plataforma (Superadmin) | `GET /platform/dashboard`, `GET/POST /platform/invitations`, `POST /platform/invitations/:id/revoke`, `GET /public/invitations/:token`, `GET /platform/requests`, `POST /platform/requests/:id/approve \| /reject {reason}`, `GET /platform/businesses[/:id]`, `POST /platform/businesses/:id/status {action, reason}`, `GET /platform/audit` | `platformService` |
 
-**Autorización en la API:** los endpoints `/staff/*`, `/business/*` y `/admin/*` buscan la fila de `personal_negocio` del usuario del token para el negocio de `X-Business-Id` y validan el rol (`owner` ⊇ `admin` ⊇ `empleado` en Caja). Los endpoints `/me/*` usan `membresias`. Las guardias del router son sólo experiencia de usuario.
+**Autorización en la API:** los endpoints `/platform/*` exigen una fila activa en `administradores_plataforma` (ser Superadmin no da acceso a `/business/*`, `/staff/*` ni `/admin/*`). Los endpoints `/staff/*`, `/business/*` y `/admin/*` buscan la fila de `usuarios_negocios` del usuario del token para el negocio de `X-Business-Id` y validan el rol (`owner` ⊇ `admin` ⊇ `empleado` en Caja). Los endpoints `/me/*` usan `membresias`. Las guardias del router son sólo experiencia de usuario.
 
 **Sesión en el frontend** (`src/services/session.js`, manejada por el store `auth`): `{ token, user (identidad, sin rol), context: {type:'cliente'} | {type:'staff', businessId, role}, access: {staff:[…], memberships}, activeBusinessId }`. El rol **siempre** sale del contexto activo.
 

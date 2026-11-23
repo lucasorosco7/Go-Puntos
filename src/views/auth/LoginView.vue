@@ -32,15 +32,18 @@ const form = useForm({ email: '', password: '' }, {
   email: [v.required('email'), v.email],
   password: [v.required('contraseña')],
 });
-const remember = ref(true);
+/** "Recordar sesión" empieza desmarcada: la sesión sólo queda guardada si la persona lo elige. */
+const remember = ref(false);
 
 /** Cuentas de prueba (datos ficticios del servidor simulado). */
 const DEMO = {
+  superadmin: { email: 'superadmin@gopuntos.demo', password: 'super1234', hint: 'Carla administra la plataforma GO Puntos: invitaciones, solicitudes, negocios y auditoría.', label: 'Superadmin', icon: 'shield' },
   cliente: { email: 'martina@demo.com', password: 'demo1234', hint: 'Martina participa en dos negocios con la misma cuenta.', label: 'Cliente', icon: 'user-round' },
   admin: { email: 'admin@cvdietetica.com', password: 'admin1234', hint: 'Administra CV Dietética: panel completo.', label: 'Administrador', icon: 'shield-check' },
   empleado: { email: 'caja@cvdietetica.com', password: 'caja1234', hint: 'Lucas es empleado de CV Dietética y, con la misma cuenta, cliente de Café Aroma.', label: 'Empleado', icon: 'scan-line' },
   cafe: { email: 'admin@cafearoma.com', password: 'admin1234', hint: 'Administra Café Aroma, con otra paleta y otros niveles.', label: 'Otro negocio', icon: 'coffee' },
-  nuevo: { email: 'nuevo@demo.com', password: 'demo1234', hint: 'Un comercio recién creado: arranca en la configuración inicial.', label: 'Negocio nuevo', icon: 'rocket' },
+  nuevo: { email: 'nuevo@demo.com', password: 'demo1234', hint: 'Sofía registró su negocio con una invitación: lo está configurando para enviarlo a revisión.', label: 'Negocio nuevo', icon: 'rocket' },
+  revision: { email: 'panaderia@demo.com', password: 'demo1234', hint: 'Panadería La Espiga ya envió su solicitud: espera la aprobación del Superadmin.', label: 'En revisión', icon: 'hourglass' },
 };
 const demoHint = ref(DEMO.cliente.hint);
 
@@ -121,5 +124,5 @@ async function onSubmit() {
   </section>
 
   <p class="auth-switch">¿Todavía no sumás puntos? <router-link :to="registerLink" class="link">Creá tu cuenta gratis</router-link></p>
-  <p class="auth-switch" style="margin-top: var(--sp-2)">¿Tenés un comercio? <router-link :to="{ name: 'register-business' }" class="link">Creá tu programa de puntos</router-link></p>
+  <p class="auth-switch" style="margin-top: var(--sp-2)">¿Tenés un comercio? <router-link :to="{ name: 'register-business' }" class="link">Registralo con tu invitación</router-link></p>
 </template>

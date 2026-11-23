@@ -2,7 +2,8 @@
  * Paletas prediseñadas de GO Puntos.
  *
  * El negocio NO elige colores sueltos: elige una paleta y, opcionalmente,
- * una variante de acento. Cada paleta define todos los tokens de la
+ * una variante de acento. También puede crear UNA paleta personalizada a
+ * partir de dos colores (paletteBuilder.js), que se valida igual. Cada paleta define todos los tokens de la
  * interfaz (marca, superficies, textos, bordes, acento, degradé de la
  * tarjeta de puntos, sombras) y está validada para contraste WCAG AA
  * (ver tests/paletas.test.js).
@@ -17,6 +18,9 @@
  *   shadow    tinte de las sombras (r g b)
  * Variantes: accent, accentHover, accentSoft, accentInk.
  */
+
+import { darkTokens } from './darkMode.js';
+import { buildCustomPalette, CUSTOM_PALETTE_ID } from './paletteBuilder.js';
 
 export const PALETTES = [
   {
@@ -109,7 +113,7 @@ export const PALETTES = [
 /** Paleta con la que nace todo negocio (identidad de GO Puntos). */
 export const DEFAULT_PALETTE = { paletteId: 'bosque', variantId: 'miel' };
 
-/** Busca una paleta y su variante (con valores por defecto si no existen). */
+/** Busca una paleta prediseñada y su variante (con valores por defecto si no existen). */
 export function findPalette(paletteId, variantId) {
   const palette = PALETTES.find((p) => p.id === paletteId) || PALETTES[0];
   const variant = palette.variants.find((v) => v.id === variantId) || palette.variants[0];
@@ -117,27 +121,62 @@ export function findPalette(paletteId, variantId) {
 }
 
 /**
- * Convierte paleta + variante en variables CSS.
- * Son las mismas variables de src/assets/styles/tokens.css: por eso cambiar
- * de paleta no requiere tocar ningún componente.
+ * Paleta efectiva de un negocio: la personalizada (generada a partir de sus
+ * dos colores) o una prediseñada.
+ * @param {string} paletteId
+ * @param {string} variantId
+ * @param {{ primary, accent, name }|null} custom  paleta personalizada guardada en el negocio
  */
-export function paletteVars(paletteId, variantId) {
-  const { palette: { base: b }, variant: v } = findPalette(paletteId, variantId);
+export function resolvePalette(paletteId, variantId, custom = null) {
+  if (paletteId === CUSTOM_PALETTE_ID && custom?.primary && custom?.accent) {
+    const built = buildCustomPalette(custom);
+    return { palette: built.palette, variant: built.variant };
+  }
+  return findPalette(paletteId, variantId);
+}
+
+/**
+ * Convierte paleta + variante en variables CSS para el modo pedido.
+ * Son las mismas variables de src/assets/styles/tokens.css: por eso cambiar
+ * de paleta o de modo no requiere tocar ningún componente.
+ * @param {object} [o]
+ * @param {object|null} [o.custom]  colores de la paleta personalizada
+ * @param {'claro'|'oscuro'} [o.mode='claro']
+ */
+export function paletteVars(paletteId, variantId, { custom = null, mode = 'claro' } = {}) {
+  const { palette: { base }, variant } = resolvePalette(paletteId, variantId, custom);
+  const t = mode === 'oscuro' ? darkTokens(base, variant) : lightTokens(base, variant);
   return {
-    '--deep': b.deep, '--forest': b.primary, '--forest-2': b.hover,
-    '--sage': b.soft, '--sage-2': b.soft2, '--cream': b.bg, '--cream-2': b.bg2,
-    '--honey': v.accent, '--honey-hover': v.accentHover, '--honey-2': v.accentSoft, '--honey-ink': v.accentInk,
-    '--grad-a': b.gradA, '--grad-b': b.gradB, '--on-dark': b.onDark, '--on-dark-soft': b.onDarkSoft,
-    '--neutral': b.neutral, '--neutral-2': b.neutral2, '--track': b.track, '--shadow-rgb': b.shadow,
+    '--deep': t.deep, '--brand': t.brand, '--forest': t.primary, '--forest-2': t.hover,
+    '--sage': t.soft, '--sage-2': t.soft2, '--cream': t.bg, '--cream-2': t.bg2,
+    '--honey': t.accent, '--honey-hover': t.accentHover, '--honey-2': t.accentSoft, '--honey-ink': t.accentInk,
+    '--grad-a': t.gradA, '--grad-b': t.gradB, '--on-dark': t.onDark, '--on-dark-soft': t.onDarkSoft,
+    '--neutral': t.neutral, '--neutral-2': t.neutral2, '--track': t.track, '--shadow-rgb': t.shadow,
+    '--tomato': t.danger, '--tomato-2': t.dangerSoft, '--sky': t.sky, '--sky-ink': t.skyInk,
     // Roles semánticos: se repiten porque las variables CSS se resuelven donde se declaran
-    '--bg': b.bg, '--surface-muted': b.bg2, '--text': b.text, '--text-muted': b.textMuted,
-    '--text-subtle': b.textSubtle, '--line': b.line, '--line-soft': b.lineSoft,
-    '--primary': b.primary, '--primary-hover': b.hover,
-    '--focus-ring': `0 0 0 2px ${b.bg}, 0 0 0 4px ${v.accent}`,
+    '--bg': t.bg, '--surface': t.surface, '--surface-muted': t.bg2, '--text': t.text, '--text-muted': t.textMuted,
+    '--text-subtle': t.textSubtle, '--text-inverse': t.textInverse, '--line': t.line, '--line-soft': t.lineSoft,
+    '--primary': t.primary, '--primary-hover': t.hover, '--on-primary': t.onPrimary, '--on-danger': t.onDanger,
+    '--danger': t.danger, '--error-bg': t.errorBg, '--success': t.success, '--success-2': t.successSoft,
+    '--focus-ring': `0 0 0 2px ${t.bg}, 0 0 0 4px ${t.accent}`,
+    '--art-glow': t.artGlow, '--art-snacks-bg': t.snacksBg, '--art-snacks-ink': t.snacksInk,
+    'color-scheme': mode === 'oscuro' ? 'dark' : 'light',
+  };
+}
+
+/** Tokens del modo claro: los de la paleta más los colores de estado fijos. */
+function lightTokens(b, v) {
+  return {
+    ...b, brand: b.primary, surface: '#ffffff', textInverse: b.bg,
+    accent: v.accent, accentHover: v.accentHover, accentSoft: v.accentSoft, accentInk: v.accentInk,
+    onPrimary: '#ffffff', onDanger: '#ffffff',
+    danger: '#c2533d', dangerSoft: '#f9e4de', errorBg: '#fffaf9', success: '#2f7a4f', successSoft: '#e3f1e7',
+    sky: '#e3eef0', skyInk: '#2c5b66',
+    artGlow: 'rgba(255, 255, 255, .55)', snacksBg: '#f3e4d2', snacksInk: '#8a5a2b',
   };
 }
 
 /** Variables como texto para un atributo style (vista previa acotada a un contenedor). */
-export function paletteStyle(paletteId, variantId) {
-  return Object.entries(paletteVars(paletteId, variantId)).map(([k, val]) => `${k}:${val}`).join(';');
+export function paletteStyle(paletteId, variantId, options = {}) {
+  return Object.entries(paletteVars(paletteId, variantId, options)).map(([k, val]) => `${k}:${val}`).join(';');
 }

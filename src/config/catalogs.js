@@ -81,6 +81,7 @@ export const STAFF_ROLES = {
 export const CONTEXT_LABELS = {
   cliente: 'Cliente',
   ...STAFF_ROLES,
+  plataforma: 'Superadmin',
 };
 
 /**

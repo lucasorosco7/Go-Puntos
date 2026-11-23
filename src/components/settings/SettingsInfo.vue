@@ -64,7 +64,7 @@ defineExpose({ save });
     <div class="settings-aside">
       <p class="group-title" style="margin-top: 0">Así te ven tus clientes</p>
       <div>
-        <div class="card join-preview" :style="paletteStyle(b.paletteId, b.paletteVariant)">
+        <div class="card join-preview" :style="paletteStyle(b.paletteId, b.paletteVariant, { custom: b.customPalette })">
           <BusinessLogo :business="previewBusiness" :size="64" />
           <p class="small muted">{{ BUSINESS_CATEGORIES[f.category] || '' }}</p>
           <p style="font-size: var(--fs-xl); font-weight: var(--fw-medium)">{{ f.name || 'Tu negocio' }}</p>

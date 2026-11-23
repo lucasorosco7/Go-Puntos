@@ -13,6 +13,7 @@ import BaseIcon from '../../components/base/BaseIcon.vue';
 import EmptyState from '../../components/base/EmptyState.vue';
 import ScreenHead from '../../components/base/ScreenHead.vue';
 import SkeletonBlock from '../../components/base/SkeletonBlock.vue';
+import ThemeModePicker from '../../components/base/ThemeModePicker.vue';
 import UserAvatar from '../../components/base/UserAvatar.vue';
 import BusinessLogo from '../../components/brand/BusinessLogo.vue';
 import BellButton from '../../components/loyalty/BellButton.vue';
@@ -213,6 +214,15 @@ async function savePassword() {
   </template>
 
   <div class="section-head"><h2>Cuenta</h2></div>
+
+  <!-- Apariencia: modo claro, oscuro o automático (preferencia de la persona) -->
+  <details class="fold">
+    <summary><BaseIcon name="moon" :size="19" /> Apariencia <BaseIcon name="chevron-down" :size="18" /></summary>
+    <div class="fold__body">
+      <p class="small muted">Elegí cómo ver la app. "Automático" sigue la configuración de tu teléfono. Se guarda en tu cuenta.</p>
+      <ThemeModePicker />
+    </div>
+  </details>
 
   <!-- Notificaciones del teléfono -->
   <details class="fold">

@@ -18,4 +18,5 @@ export { notificationService } from './notificationService.js';
 export { metricsService, METRIC_RANGES } from './metricsService.js';
 export { pushService } from './pushService.js';
 export { qrService, QR_PREFIX } from './qrService.js';
+export { platformService } from './platformService.js';
 export { ApiError } from './errors.js';

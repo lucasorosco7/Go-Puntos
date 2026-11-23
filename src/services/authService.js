@@ -1,8 +1,9 @@
 /**
  * Servicio de autenticación de GO Puntos.
  *
- * Responsabilidad: ingreso, registro de clientes y de comercios, cambio de
- * contexto (cliente ↔ panel de un negocio), perfil de la cuenta y contraseña.
+ * Responsabilidad: ingreso, registro de clientes y de comercios (con invitación),
+ * cambio de contexto (cliente ↔ panel de un negocio ↔ plataforma), perfil de la
+ * cuenta y contraseña.
  *
  * NO guarda la sesión: eso lo hace el store de autenticación (stores/auth.js)
  * con el resultado de estos métodos. Así el service queda igual cuando se
@@ -10,13 +11,15 @@
  *
  * Endpoints previstos:
  *   POST /auth/login             { email, password }          → { token, user, access, memberships }
- *   POST /auth/context           { type, businessId }         → { context, access }
+ *                                (access.platform = true si la cuenta es Superadmin)
+ *   POST /auth/context           { type, businessId }         → { context, access }   (type: cliente | staff | plataforma)
  *   POST /auth/register          { ...datos, joinSlug }       → { token, user, access, membership, business }
- *   POST /auth/register-business { ...datos, businessName }   → { token, user, access, business }
+ *   POST /auth/register-business { ...datos, businessName, invitationToken } → { token, user, access, business }
  *   POST /auth/forgot-password   { email }                    → { message }
  *   POST /auth/logout                                         → 204
  *   PUT  /me                     { firstName, lastName, email, phone } → user
  *   PUT  /me/password            { current, password }        → { ok }
+ *   PUT  /me/preferences         { mode }                     → user (mode: 'claro' | 'oscuro' | 'auto')
  */
 import { appConfig } from '../config/app.config.js';
 import { http } from './http.js';
@@ -34,7 +37,7 @@ export const authService = {
 
   /**
    * Cambia el contexto activo con la MISMA cuenta.
-   * target: { type: 'cliente' } o { type: 'staff', businessId }
+   * target: { type: 'cliente' }, { type: 'staff', businessId } o { type: 'plataforma' }
    * El servidor confirma que la persona tenga un rol en ese negocio y devuelve
    * el contexto con su rol real (owner, admin o empleado).
    */
@@ -51,7 +54,10 @@ export const authService = {
     write: true, ms: 700,
   }),
 
-  /** Alta de un comercio: crea la cuenta (dueña) y el negocio en borrador. */
+  /**
+   * Alta de un comercio con una invitación válida: crea (o reutiliza) la cuenta,
+   * el negocio en estado 'pendiente' y su solicitud, todavía sin enviar a revisión.
+   */
   registerBusiness: (data) => send({
     mock: async () => (await mocks()).registerBusiness(data),
     api: () => http.post('/auth/register-business', data),
@@ -79,6 +85,13 @@ export const authService = {
     mock: async () => (await mocks()).updateProfile(values),
     api: () => http.put('/me', values),
     write: true,
+  }),
+
+  /** Preferencias de la persona (modo claro, oscuro o automático). Viajan con su cuenta. */
+  updatePreferences: (values) => send({
+    mock: async () => (await mocks()).updatePreferences(values),
+    api: () => http.put('/me/preferences', values),
+    write: true, ms: 120,
   }),
 
   changePassword: (data) => send({

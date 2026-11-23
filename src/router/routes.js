@@ -7,12 +7,13 @@
  *   ClientLayout  app del cliente con 4 pestañas
  *   BareLayout    pantallas sin menú (Mi código, Canje, Sumarse a un negocio)
  *   AdminLayout   panel del negocio
+ *   PlatformLayout panel de la plataforma (Superadmin)
  *
  * meta:
  *   title      título de la pestaña del navegador
  *   auth       requiere sesión
  *   guestOnly  sólo sin sesión (login, registro)
- *   context    'cliente' | 'staff'  contexto activo requerido
+ *   context    'cliente' | 'staff' | 'plataforma'  contexto activo requerido
  *   roles      roles del personal permitidos en ESTE negocio (owner, admin, empleado)
  *   theme      'default' = identidad de GO Puntos (sin paleta del negocio)
  *   tab / nav  qué pestaña o qué opción del menú se resalta
@@ -24,6 +25,7 @@ import AdminLayout from '../layouts/AdminLayout.vue';
 import AuthLayout from '../layouts/AuthLayout.vue';
 import BareLayout from '../layouts/BareLayout.vue';
 import ClientLayout from '../layouts/ClientLayout.vue';
+import PlatformLayout from '../layouts/PlatformLayout.vue';
 import PublicLayout from '../layouts/PublicLayout.vue';
 
 const OWNER_ADMIN = ['owner', 'admin'];
@@ -50,8 +52,17 @@ export const routes = [
     children: [
       { path: 'ingresar', name: 'login', component: () => import('../views/auth/LoginView.vue'), meta: { title: 'Ingresar' } },
       { path: 'registro', name: 'register', component: () => import('../views/auth/RegisterView.vue'), meta: { title: 'Crear cuenta' } },
-      { path: 'registro-negocio', name: 'register-business', component: () => import('../views/auth/RegisterBusinessView.vue'), meta: { title: 'Crear el programa de tu comercio' } },
       { path: 'recuperar', name: 'forgot', component: () => import('../views/auth/ForgotPasswordView.vue'), meta: { title: 'Recuperar contraseña' } },
+    ],
+  },
+
+  /* ---------- Alta de un negocio con invitación (con o sin sesión: una cuenta existente puede registrar su negocio) ---------- */
+  {
+    path: '/',
+    component: AuthLayout,
+    meta: { theme: 'default' },
+    children: [
+      { path: 'registro-negocio', name: 'register-business', component: () => import('../views/auth/RegisterBusinessView.vue'), meta: { title: 'Crear el programa de tu comercio' } },
     ],
   },
 
@@ -114,6 +125,21 @@ export const routes = [
         component: () => import('../views/admin/SettingsView.vue'), meta: { title: 'Configuración', roles: OWNER_ADMIN },
       },
       { path: 'configuracion-inicial', name: 'admin-onboarding', component: () => import('../views/admin/OnboardingView.vue'), meta: { title: 'Configuración inicial', roles: OWNER_ADMIN, nav: 'admin-settings' } },
+    ],
+  },
+
+  /* ---------- Panel de la plataforma (Superadmin) ---------- */
+  {
+    path: '/plataforma',
+    component: PlatformLayout,
+    meta: { auth: true, context: 'plataforma' },
+    children: [
+      { path: '', name: 'platform-dashboard', component: () => import('../views/platform/PlatformDashboardView.vue'), meta: { title: 'Plataforma' } },
+      { path: 'solicitudes', name: 'platform-requests', component: () => import('../views/platform/RequestsView.vue'), meta: { title: 'Solicitudes' } },
+      { path: 'negocios', name: 'platform-businesses', component: () => import('../views/platform/BusinessesView.vue'), meta: { title: 'Negocios' } },
+      { path: 'negocios/:id(\\d+)', name: 'platform-business', component: () => import('../views/platform/BusinessDetailView.vue'), meta: { title: 'Ficha del negocio', nav: 'platform-businesses' } },
+      { path: 'invitaciones', name: 'platform-invitations', component: () => import('../views/platform/InvitationsView.vue'), meta: { title: 'Invitaciones' } },
+      { path: 'auditoria', name: 'platform-audit', component: () => import('../views/platform/AuditView.vue'), meta: { title: 'Auditoría' } },
     ],
   },
 

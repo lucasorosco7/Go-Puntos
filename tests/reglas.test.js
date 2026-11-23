@@ -124,7 +124,12 @@ test('un canje baja el saldo pero no los puntos del mes', () => {
 
 test('roles: las cuentas no tienen rol; el personal vive aparte', () => {
   assert.ok(state.users.every((u) => !('role' in u) && !('businessId' in u)));
-  assert.equal(state.businessStaff.length, 4);
+  // Un dueño por negocio (6 negocios de prueba) + Lucas, empleado de CV Dietética
+  assert.equal(state.businessStaff.filter((x) => x.role === 'owner').length, state.businesses.length);
+  assert.equal(state.businessStaff.length, state.businesses.length + 1);
+  // El Superadmin no es personal de ningún negocio
+  const superadmin = state.platformAdmins[0].userId;
+  assert.ok(!state.businessStaff.some((x) => x.userId === superadmin));
   // Lucas es empleado de CV Dietética y cliente de Café Aroma con la misma cuenta
   assert.equal(S.staffRow(state, 2, 1)?.role, 'empleado');
   assert.ok(S.membershipOf(state, 2, 2));

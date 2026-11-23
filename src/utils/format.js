@@ -13,6 +13,7 @@ const currencyFmt = new Intl.NumberFormat('es-AR', { style: 'currency', currency
 const shortDateFmt = new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short' });
 const longDateFmt = new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
 const dateTimeFmt = new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+const fullDateTimeFmt = new Intl.DateTimeFormat('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 const monthFmt = new Intl.DateTimeFormat('es-AR', { month: 'long' });
 
 export const format = {
@@ -28,6 +29,8 @@ export const format = {
   longDate: (iso) => longDateFmt.format(new Date(iso)),
   /** "14 sept, 18:40" */
   dateTime: (iso) => dateTimeFmt.format(new Date(iso)).replace('.', ''),
+  /** "14/09/2026, 18:40" (auditoría: fecha completa con año y hora) */
+  fullDateTime: (iso) => fullDateTimeFmt.format(new Date(iso)),
 
   greeting(date = new Date()) {
     const h = date.getHours();

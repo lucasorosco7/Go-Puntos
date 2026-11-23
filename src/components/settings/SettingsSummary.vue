@@ -8,7 +8,7 @@ import { computed } from 'vue';
 import { levels as Levels } from '../../domain/levels.js';
 import { notificationTypes } from '../../domain/notifications.js';
 import { points as Points } from '../../domain/points.js';
-import { findPalette } from '../../theme/palettes.js';
+import { resolvePalette } from '../../theme/palettes.js';
 import { format } from '../../utils/format.js';
 import BaseAlert from '../base/BaseAlert.vue';
 import BaseIcon from '../base/BaseIcon.vue';
@@ -18,12 +18,12 @@ const emit = defineEmits(['reload', 'goto']);
 
 const rows = computed(() => {
   const { business: b, levels, rewards, offers, challenges } = props.ctx;
-  const pal = findPalette(b.paletteId, b.paletteVariant);
+  const pal = resolvePalette(b.paletteId, b.paletteVariant, b.customPalette);
   const prize = b.monthlyPrize;
   const notif = notificationTypes.configurable;
   return [
     ['store', 'Negocio', b.name || 'Sin nombre', 'info', Boolean(b.name)],
-    ['palette', 'Identidad', `${pal.palette.name} · ${pal.variant.name}`, 'identity', true],
+    ['palette', 'Identidad', pal.palette.custom ? `${pal.palette.name} (personalizada)` : `${pal.palette.name} · ${pal.variant.name}`, 'identity', true],
     ['calculator', 'Puntos', Points.describeRule(b.pointsRule) + (b.pointsRule.welcomeBonus ? ` · ${b.pointsRule.welcomeBonus} de bienvenida` : ''), 'points', true],
     ['medal', 'Niveles', Levels.sorted(levels).map((l) => `${l.name} (${format.points(l.minPoints)})`).join(' · '), 'levels', true],
     ['gift', 'Recompensas', rewards.length ? format.plural(rewards.length, 'recompensa', 'recompensas') : 'Ninguna todavía', 'rewards', rewards.length > 0],
@@ -45,5 +45,8 @@ defineExpose({ save: async () => null });
       <button type="button" class="link" @click="emit('goto', step)">Editar</button>
     </li>
   </ul>
-  <BaseAlert v-if="!ctx.rewards.length" tone="info" title="Podés activar sin recompensas" text="Tus clientes ya pueden sumar puntos; cargá las recompensas cuando quieras." />
+  <BaseAlert
+    v-if="ctx.business.status !== 'activo' && !ctx.rewards.some((r) => r.status === 'activa')" tone="info" title="Falta al menos una recompensa activa"
+    text="GO Puntos revisa que tu programa tenga algo para canjear antes de aprobarlo. Cargá una recompensa y volvé a este paso."
+  />
 </template>

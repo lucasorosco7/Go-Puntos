@@ -53,6 +53,18 @@
   --success:       #2f7a4f;
   --success-2:     #e3f1e7;
   --focus-ring:    0 0 0 2px var(--bg), 0 0 0 4px var(--honey);
+  /* Agregados para el modo oscuro (src/theme/darkMode.js los recalcula):
+     --brand      color de marca original, para degradés y monogramas (siempre oscuro)
+     --on-primary texto sobre botones del color principal (blanco en claro, tinta oscura en oscuro)
+     --on-danger  texto sobre botones de peligro
+     --error-bg   fondo de un campo con error */
+  --brand:         var(--forest);
+  --on-primary:    #ffffff;
+  --on-danger:     #ffffff;
+  --error-bg:      #fffaf9;
+  --art-glow:      rgba(255, 255, 255, .55); /* brillo detrás del ícono de las ilustraciones */
+  --art-snacks-bg: #f3e4d2;
+  --art-snacks-ink:#8a5a2b;
 
   /* ---------- Tipografía ---------- */
   --font: 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;

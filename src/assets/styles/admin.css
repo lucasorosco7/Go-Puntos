@@ -76,7 +76,7 @@
 
 /* Grillas */
 .grid { display: grid; gap: var(--sp-4); }
-.grid--stats { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--sp-3); }
+.grid--stats { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--sp-3); }
 .grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid--main { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start; }
 @media (max-width: 1080px) { .grid--main { grid-template-columns: 1fr; } }
@@ -85,13 +85,24 @@
 .panel-card__head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-4); }
 .panel-card__head h2 { font-size: var(--fs-md); }
 
-/* Indicadores */
-.stat { background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--radius-lg); padding: var(--sp-4); min-width: 0; }
-.stat__label { display: flex; align-items: center; gap: 6px; font-size: var(--fs-sm); color: var(--text-muted); }
-.stat__label .ic { color: var(--forest-2); }
-.stat__value { font-size: clamp(var(--fs-lg), 5.2vw, var(--fs-2xl)); overflow-wrap: anywhere; font-weight: var(--fw-medium); letter-spacing: -.02em; margin-top: var(--sp-1); }
-.stat__hint { font-size: var(--fs-xs); color: var(--text-subtle); margin-top: 2px; }
+/* Indicadores (KPI)
+   El título va en tamaño de lectura (16 px) y el ícono en una pastilla.
+   Los tonos agrupan los indicadores por tema con colores DERIVADOS de la
+   paleta del negocio (funcionan en claro y en oscuro); los números y los
+   textos usan siempre los colores de texto, nunca el color del tono. */
+.stat { background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--radius-lg); padding: var(--sp-4); min-width: 0; container-type: inline-size; }
+.stat__label { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-md); font-weight: var(--fw-medium); color: var(--text); line-height: 1.25; }
+.stat__icon { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; flex-shrink: 0; background: var(--sage-2); color: var(--forest-2); }
+/* El número se adapta al ancho de la tarjeta (unidades de contenedor) y nunca se corta a la mitad */
+.stat__value { font-size: clamp(1.125rem, 17cqi, var(--fs-3xl)); white-space: nowrap; font-weight: var(--fw-medium); letter-spacing: -.02em; margin-top: var(--sp-3); line-height: 1.1; }
+.stat__hint { font-size: var(--fs-sm); color: var(--text-muted); margin-top: var(--sp-1); }
 .stat--accent { background: var(--sage-2); border-color: var(--sage); }
+.stat--accent .stat__icon, .stat--marca .stat__icon, .stat--acento .stat__icon, .stat--info .stat__icon { background: var(--surface); }
+.stat--marca  { background: var(--sage); border-color: color-mix(in srgb, var(--forest) 18%, transparent); }
+.stat--acento { background: var(--honey-2); border-color: color-mix(in srgb, var(--honey) 35%, transparent); }
+.stat--acento .stat__icon { color: var(--honey-ink); }
+.stat--info   { background: var(--sky); border-color: color-mix(in srgb, var(--sky-ink) 18%, transparent); }
+.stat--info .stat__icon { color: var(--sky-ink); }
 
 /* Gráfico de barras (una serie, color primario del negocio) */
 .chart { display: grid; gap: var(--sp-2); }
@@ -209,7 +220,7 @@
 .wizard__step:hover { background: var(--surface); }
 .wizard__step.is-on { background: var(--surface); color: var(--text); font-weight: var(--fw-medium); box-shadow: var(--shadow-sm); }
 .wizard__num { display: grid; place-items: center; width: 26px; height: 26px; flex-shrink: 0; border-radius: 50%; background: var(--neutral); font-size: var(--fs-xs); }
-.wizard__step.is-done .wizard__num { background: var(--forest-2); color: #fff; }
+.wizard__step.is-done .wizard__num { background: var(--forest-2); color: var(--on-primary); }
 .wizard__step.is-skipped .wizard__num { background: var(--honey-2); color: var(--honey-ink); }
 .wizard__step.is-on .wizard__num { background: var(--honey); color: var(--deep); }
 .wizard__panel { background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--radius-xl); padding: var(--sp-6); min-width: 0; }
@@ -269,4 +280,100 @@
 @media (max-width: 1440px) {
   .wizard .settings-split { grid-template-columns: 1fr; }
   .wizard .settings-aside { position: static; }
+}
+
+/* Indicadores en el celular: dos columnas con números un poco más chicos */
+@media (max-width: 520px) {
+  .grid--stats { grid-template-columns: 1fr 1fr; }
+  .stat { padding: var(--sp-3); }
+  .stat__label { font-size: var(--fs-base); }
+  .stat__icon { width: 30px; height: 30px; }
+}
+
+/* ---------- Paleta personalizada (Personalización) ---------- */
+.palette--new { border-style: dashed; justify-items: center; align-content: center; text-align: center; color: var(--text-muted); }
+.palette--new .ic { color: var(--forest); }
+.custom-palette { display: grid; gap: var(--sp-4); margin-top: var(--sp-4); padding: var(--sp-4); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface-muted); }
+.color-pick { display: flex; align-items: flex-start; gap: var(--sp-2); }
+.color-pick input[type="color"] {
+  width: 52px; height: 48px; padding: 4px; flex-shrink: 0; margin-top: 26px; /* alineado con el campo, debajo de la etiqueta */
+  border: 1.5px solid var(--line); border-radius: var(--radius-md); background: var(--surface); cursor: pointer;
+}
+.color-pick .field { flex: 1; }
+.checks-list { display: grid; gap: 4px; margin-top: var(--sp-2); font-size: var(--fs-sm); }
+.checks-list li { display: flex; justify-content: space-between; gap: var(--sp-3); color: var(--text-muted); }
+.checks-list li.is-bad { color: var(--danger); }
+.preview-mode { margin-bottom: var(--sp-3); }
+
+/* =====================================================================
+   Panel de la plataforma (Superadmin) y estado del negocio
+   Usa sólo tokens de la paleta: funciona en claro y en oscuro.
+   ===================================================================== */
+/* Contador del menú lateral (solicitudes para revisar) */
+.admin-side__badge {
+  margin-left: auto; min-width: 22px; height: 22px; padding: 0 7px; border-radius: var(--radius-pill);
+  display: inline-grid; place-items: center; font-size: var(--fs-xs); font-weight: var(--fw-medium);
+  background: var(--honey); color: var(--deep);
+}
+/* Indicador de alerta (suspendidos o bloqueados) */
+.stat--alerta { background: var(--tomato-2); border-color: color-mix(in srgb, var(--danger) 22%, transparent); }
+.stat--alerta .stat__icon { background: var(--surface); color: var(--danger); }
+
+/* Negocio en tablas y tarjetas */
+.biz-cell { display: inline-flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.biz-cell__name { display: block; font-weight: var(--fw-medium); color: var(--text); }
+.biz-cell__meta { display: block; font-size: var(--fs-sm); color: var(--text-muted); }
+
+/* Datos en pares título / valor */
+.facts { display: grid; gap: var(--sp-3); }
+.facts dt { font-size: var(--fs-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+.facts dd { margin: 2px 0 0; color: var(--text); overflow-wrap: anywhere; }
+
+/* Requisitos (enviar a revisión) */
+button.check-chip { padding: 0; border: 0; background: none; font: inherit; cursor: pointer; }
+.check-chip.is-missing span { border-color: color-mix(in srgb, var(--danger) 45%, transparent); color: var(--danger); background: var(--tomato-2); }
+.review-box { margin-top: var(--sp-4); padding: var(--sp-4); border: 1px dashed var(--line); border-radius: var(--radius-lg); display: grid; gap: var(--sp-3); }
+
+/* Solicitudes */
+.review-list { display: grid; gap: var(--sp-3); }
+.review-list li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--sp-1) var(--sp-3); padding-bottom: var(--sp-3); border-bottom: 1px solid var(--line-soft); }
+.review-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+.review-list li .small { grid-column: 1; }
+.review-list li .btn { grid-column: 2; grid-row: 1 / span 2; }
+.request-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: var(--sp-4); }
+.request-card { display: grid; gap: var(--sp-3); align-content: start; }
+.request-card.is-target { box-shadow: 0 0 0 3px color-mix(in srgb, var(--honey) 60%, transparent); }
+.request-card__head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--sp-3); flex-wrap: wrap; }
+.request-card__actions { display: flex; justify-content: flex-end; gap: var(--sp-2); flex-wrap: wrap; padding-top: var(--sp-2); border-top: 1px solid var(--line-soft); }
+
+/* Auditoría */
+.audit-list { display: grid; gap: var(--sp-3); }
+.audit-list__item { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-3); align-items: start; }
+.audit-list__body { display: grid; gap: 2px; min-width: 0; }
+.audit-list__icon { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--surface-muted); color: var(--text-muted); }
+.audit-list__icon.is-green { background: var(--sage-2); color: var(--forest); }
+.audit-list__icon.is-sky { background: var(--sky); color: var(--sky-ink); }
+.audit-list__icon.is-danger { background: var(--tomato-2); color: var(--danger); }
+.audit-detail { max-width: 46ch; color: var(--text-muted); }
+.cell-stack { display: inline-grid; gap: 4px; justify-items: start; text-align: left; }
+@media (max-width: 720px) { .cell-stack { justify-items: end; text-align: right; } }
+.status-reason { max-width: 32ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 4px; }
+
+/* Acciones por fila y ficha */
+.row-actions { display: inline-flex; gap: var(--sp-1); flex-wrap: nowrap; justify-content: flex-end; }
+.row-actions .btn { white-space: nowrap; }
+.detail-status { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-4); }
+.team-list { display: grid; gap: var(--sp-2); }
+.team-list li { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-3); }
+
+/* Formularios de hoja (motivo, invitación) */
+.reason-form { display: grid; gap: var(--sp-3); }
+.invite-link { display: flex; gap: var(--sp-2); }
+.invite-link .field__input { flex: 1; min-width: 0; font-family: ui-monospace, monospace; font-size: var(--fs-sm); }
+
+@media (max-width: 720px) {
+  .review-list li { grid-template-columns: 1fr; }
+  .review-list li .btn { grid-column: 1; grid-row: auto; justify-self: start; }
+  .invite-link { flex-direction: column; }
+  .row-actions { justify-content: flex-start; }
 }

@@ -3,18 +3,20 @@
  * configuración inicial (onboarding), activación y personal del negocio.
  *
  * Equivalen a: GET /businesses/:slug/public, GET|PATCH /business, PUT /business/levels,
- * PATCH /business/onboarding, POST /business/activate y /business/employees.
+ * PATCH /business/onboarding, POST /business/submit-review y /business/employees.
+ * El negocio NO se activa solo: lo aprueba el Superadmin (solicitudes_negocio).
  */
 import { challenges as Challenges } from '../../domain/challenges.js';
 import { levels as Levels } from '../../domain/levels.js';
 import { offers as Offers } from '../../domain/offers.js';
 import { rewards as Rewards } from '../../domain/rewards.js';
-import { periodOf } from '../../utils/dates.js';
+import { CUSTOM_PALETTE_ID, CUSTOM_VARIANT_ID, buildCustomPalette } from '../../theme/paletteBuilder.js';
+import { PALETTES } from '../../theme/palettes.js';
 import { admin, publicUser, staff } from './common.js';
 
 /** Campos que el dueño o administrador puede modificar. */
 const EDITABLE = ['name', 'description', 'category', 'address', 'city', 'phone', 'email', 'social', 'logo', 'logoIcon',
-  'paletteId', 'paletteVariant', 'pointsRule', 'ranking', 'monthlyPrize', 'challengesEnabled', 'streaks',
+  'paletteId', 'paletteVariant', 'customPalette', 'pointsRule', 'ranking', 'monthlyPrize', 'challengesEnabled', 'streaks',
   'notifications', 'redemptionValidityDays'];
 
 /** Negocio con sus niveles, recompensas y contadores (para el panel). */
@@ -30,6 +32,8 @@ function withExtras(s, S, b) {
       challenges: s.challenges.filter((c) => c.businessId === b.id && Challenges.isLive(c)).length,
       employees: s.businessStaff.filter((x) => x.businessId === b.id && x.role === 'empleado' && x.active).length,
     },
+    // Estado frente a la plataforma: solicitud, motivo de rechazo/suspensión y requisitos para enviar a revisión
+    platform: S.platformInfoOf(s, b),
   };
 }
 
@@ -62,6 +66,20 @@ export const businessesApi = {
     if ('name' in clean && !String(clean.name).trim()) throw new S.ServerError('El negocio necesita un nombre.', 422, { field: 'name' });
     if (clean.pointsRule && (!(clean.pointsRule.pesos > 0) || !(clean.pointsRule.points > 0))) {
       throw new S.ServerError('La equivalencia necesita pesos y puntos mayores a cero.', 422, { field: 'pesos' });
+    }
+    // Paleta: una prediseñada o la personalizada (que el servidor vuelve a generar y validar)
+    if (clean.customPalette) {
+      try {
+        const built = buildCustomPalette(clean.customPalette);
+        if (!built.ok) throw new Error('La paleta no alcanza el contraste mínimo.');
+        clean.customPalette = { name: built.palette.name, primary: built.palette.base.primary, accent: built.variant.accent };
+      } catch (err) { throw new S.ServerError(err.message, 422, { field: 'customPalette' }); }
+    }
+    if ('paletteId' in clean) {
+      const custom = clean.paletteId === CUSTOM_PALETTE_ID;
+      if (custom && !(clean.customPalette || b.customPalette)) throw new S.ServerError('Primero creá tu paleta personalizada.', 422, { field: 'paletteId' });
+      if (!custom && !PALETTES.some((p) => p.id === clean.paletteId)) throw new S.ServerError('Elegí una de las paletas disponibles.', 422, { field: 'paletteId' });
+      if (custom) clean.paletteVariant = CUSTOM_VARIANT_ID;
     }
     Object.assign(b, clean);
     // Mientras no tenga clientes, el nombre define la dirección pública (QR) y el prefijo de los códigos
@@ -121,15 +139,17 @@ export const businessesApi = {
     return b.onboarding;
   },
 
-  /** Activa el programa: desde ahora los clientes pueden sumarse. */
-  activate: () => (s, S, ctx) => {
+  /**
+   * Envía la solicitud de alta a revisión (o la reenvía después de un rechazo).
+   * Requiere la configuración mínima: nombre, regla de puntos, niveles y una recompensa.
+   * Equivale a: POST /business/submit-review
+   */
+  submitForReview: () => (s, S, ctx) => {
     const { business: b } = admin(s, S, ctx);
-    if (!String(b.name || '').trim()) throw new S.ServerError('Poné el nombre del negocio antes de activarlo.', 422);
-    b.status = 'activo';
-    b.onboarding.completed = true;
+    S.submitForReview(s, { businessId: b.id, date: new Date() });
+    b.onboarding.steps.summary = 'done';
     b.onboarding.dismissed = true;
-    b.currentPeriod = periodOf(new Date());
-    return b;
+    return withExtras(s, S, b);
   },
 
   /* ---------- Personal del negocio (empleados opcionales) ----------
@@ -147,6 +167,11 @@ export const businessesApi = {
     let u = s.users.find((x) => x.email.toLowerCase() === data.email.trim().toLowerCase());
     const reused = Boolean(u);
     if (u && S.staffRow(s, u.id, b.id)) throw new S.ServerError('Esa persona ya tiene un rol en tu negocio.', 409, { field: 'email' });
+    // Un rol por persona y negocio (usuarios_negocios es único por usuario + negocio): un cliente
+    // de este negocio no puede ser, a la vez, su empleado. Sí puede trabajar en otro negocio.
+    if (u && S.membershipOf(s, u.id, b.id)) {
+      throw new S.ServerError('Esa persona ya es cliente de tu negocio. Por ahora una cuenta tiene un solo rol en cada negocio.', 409, { field: 'email' });
+    }
     if (!u) {
       u = {
         id: S.nextId(s, 'users'), firstName: data.firstName.trim(), lastName: data.lastName.trim(),

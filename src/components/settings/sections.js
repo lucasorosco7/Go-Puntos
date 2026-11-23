@@ -45,8 +45,8 @@ export const SECTIONS = {
     description: 'Objetivos con premio y rachas de compras semanales. Aparecen en el perfil del cliente y por notificación, sin recargar la pantalla principal.' },
   notifications: { slug: 'notificaciones', tab: 'Notificaciones', title: 'Notificaciones', icon: 'bell-ring', component: SettingsNotifications,
     description: 'Qué avisos automáticos reciben tus clientes en la campana de la app.' },
-  summary: { title: 'Resumen y activación', icon: 'rocket', component: SettingsSummary,
-    description: 'Revisá todo. Podés activar ahora y seguir ajustando después desde Configuración.' },
+  summary: { title: 'Resumen y envío a revisión', icon: 'rocket', component: SettingsSummary,
+    description: 'Revisá todo y enviá tu programa a GO Puntos. Cuando lo aprueben, tus clientes podrán sumarse. Podés seguir ajustando después desde Configuración.' },
   team: { slug: 'empleados', tab: 'Empleados', title: 'Empleados', icon: 'id-card', component: SettingsTeam, standalone: true },
   qr: { slug: 'qr', tab: 'QR del negocio', title: 'QR del negocio', icon: 'qr-code', component: SettingsQr, standalone: true },
 };

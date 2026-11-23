@@ -9,7 +9,8 @@
  *   1. guestOnly  → con sesión, va a la pantalla de inicio de su contexto
  *                   (salvo mientras se está cerrando la sesión).
  *   2. auth       → sin sesión, va al ingreso con ?next=<ruta pedida>.
- *   3. context    → la ruta es de otro contexto (cliente vs. panel): va a su inicio.
+ *   3. context    → la ruta es de otro contexto (cliente, panel del negocio o
+ *                   plataforma): va a su inicio.
  *   4. roles      → su rol en ESTE negocio no alcanza (ej.: empleado en Dashboard): va a su inicio.
  * El rol siempre sale del contexto activo, nunca de la cuenta.
  */

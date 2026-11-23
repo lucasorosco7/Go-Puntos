@@ -64,6 +64,8 @@ const featured = computed(() => data.value.offers.find((o) => o.featured) || dat
 /** Una sola línea de aviso contextual (racha en riesgo, desafío a un paso, cerca de subir). */
 const nudge = computed(() => pickNudge({ business: data.value.business, streak: data.value.streak, challenges: data.value.challenges, levelInfo: data.value.levelInfo }));
 const ranking = computed(() => data.value.ranking);
+/** El negocio no está activo (suspendido o bloqueado por la plataforma): se avisa y no se puede operar. */
+const paused = computed(() => data.value && data.value.business.status !== 'activo');
 </script>
 
 <template>
@@ -102,6 +104,12 @@ const ranking = computed(() => data.value.ranking);
   </div>
 
   <template v-else-if="data">
+    <!-- Negocio suspendido o bloqueado: los puntos se conservan pero no se puede operar -->
+    <BaseAlert
+      v-if="paused" tone="info" style="margin-bottom: var(--sp-3)"
+      :title="data.business.status === 'bloqueado' ? `${data.business.name} ya no está disponible en GO Puntos` : `El programa de ${data.business.name} está pausado`"
+      text="Tus puntos quedan guardados, pero por ahora no se pueden sumar ni canjear en este comercio."
+    />
     <!-- Saldo disponible para canjear -->
     <PointsCard :balance="m.balance" :next-reward="nextReward" />
 

@@ -3,7 +3,7 @@
  *
  * Responsabilidad: datos públicos del negocio (página del QR), configuración
  * del programa (identidad, paleta, regla de puntos, ranking, premio, rachas,
- * notificaciones), niveles, configuración inicial, activación y personal.
+ * notificaciones), niveles, configuración inicial, envío a revisión y personal.
  *
  * Las operaciones del panel actúan sobre el negocio del contexto activo
  * (encabezado X-Business-Id). Configurar requiere rol dueño o administrador.
@@ -11,11 +11,11 @@
  * Endpoints previstos:
  *   GET   /businesses/:slug/public           → { business, levels, rewards, isMember }
  *   GET   /businesses/:slug/rewards          → [reward]
- *   GET   /business                          → { business, levels, rewards, counts }
+ *   GET   /business                          → { business, levels, rewards, counts, platform }
  *   PATCH /business            { ...campos } → business
  *   PUT   /business/levels     [level]       → [level]
  *   PATCH /business/onboarding { step, status }   /   POST /business/onboarding/dismiss
- *   POST  /business/activate                 → business
+ *   POST  /business/submit-review            → { business, …, platform }  (envía la solicitud al Superadmin)
  *   GET   /business/employees                → [persona]
  *   POST  /business/employees  { ... }       → persona (reused = la cuenta ya existía)
  *   PATCH /business/employees/:userId { active }   /   DELETE /business/employees/:userId
@@ -73,10 +73,13 @@ export const businessService = {
     write: true, ms: 120,
   }),
 
-  /** Publica el negocio: desde ese momento los clientes pueden sumarse con el QR. */
-  activate: () => send({
-    mock: async () => (await mocks()).activate(),
-    api: () => http.post('/business/activate'),
+  /**
+   * Envía la solicitud de alta a revisión del Superadmin (o la reenvía después de
+   * un rechazo). El negocio empieza a operar recién cuando la aprueban.
+   */
+  submitForReview: () => send({
+    mock: async () => (await mocks()).submitForReview(),
+    api: () => http.post('/business/submit-review'),
     write: true,
   }),
 

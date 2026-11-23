@@ -211,6 +211,9 @@ export function buildSeed(now = new Date()) {
       password: 'admin1234', phone: '381 555-0200', createdAt: businesses[1].createdAt, active: true },
     { id: 4, firstName: 'Sofía', lastName: 'Paz', email: 'nuevo@demo.com',
       password: 'demo1234', phone: '381 555-0300', createdAt: iso(ago(1, 10, 0)), active: true },
+    // Superadmin (administrador de la plataforma GO Puntos): no es personal de ningún negocio
+    { id: 5, firstName: 'Carla', lastName: 'Medina', email: 'superadmin@gopuntos.demo',
+      password: 'super1234', phone: '381 555-0001', createdAt: iso(ago(170, 9, 0)), active: true },
     { id: 124, firstName: 'Martina', lastName: 'López', email: 'martina@demo.com', password: 'demo1234',
       phone: '381 555-0142', createdAt: iso(ago(120, 10, 0)), active: true },
   ];
@@ -254,6 +257,10 @@ export function buildSeed(now = new Date()) {
     ],
     memberships: [], movements: [], redemptions: [], challengeCompletions: [],
     notifications: [], campaigns: [], periodCloses: [],
+    // Administración de la plataforma (tablas administradores_plataforma, invitaciones_registro,
+    // solicitudes_negocio y auditoria_plataforma). Se completan al final (sección 9).
+    platformAdmins: [{ id: 1, userId: 5, assignedAt: iso(ago(170, 9, 0)), status: 'activo' }],
+    invitations: [], businessRequests: [], platformAudit: [],
   };
 
   const events = [];
@@ -369,9 +376,101 @@ export function buildSeed(now = new Date()) {
   const lastLevelUp = state.notifications.filter((n) => n.userId === 124 && n.businessId === 1 && n.type === 'nivel').pop();
   if (lastLevelUp) Object.assign(lastLevelUp, { read: false, popupShown: false });
 
-  // Negocio nuevo para probar el onboarding (se crea al final: no tiene historia).
-  // createBusiness registra a Sofía (id 4) como dueña en businessStaff.
-  S.createBusiness(state, { adminUserId: 4, name: '', category: 'otro', date: ago(1, 10, 0) });
-
+  seedPlatform(state, { ago, iso });
   return state;
 }
+
+/* ===================== 9. Plataforma (Superadmin) =====================
+   Invitaciones, solicitudes y auditoría coherentes con los negocios:
+   - CV Dietética y Café Aroma: invitación utilizada + solicitud aprobada.
+   - Sofía (nuevo@demo.com): negocio recién registrado, solicitud EN PREPARACIÓN.
+   - Panadería La Espiga: solicitud EN REVISIÓN (para aprobar o rechazar en la demo).
+   - Kiosco Avenida: solicitud RECHAZADA con motivo.
+   - Librería del Sur: aprobada y después SUSPENDIDA con motivo.
+   - Invitaciones sueltas: una vigente, una vencida y una revocada.
+   Los tokens de prueba son conocidos para poder abrir los enlaces desde el README.
+   En la base real sólo se guarda el hash del token (token_hash). */
+function seedPlatform(state, { ago, iso }) {
+  const ADMIN = 1; // id de administradores_plataforma
+  const hour = (d, h) => new Date(new Date(d).getTime() + h * 3600000);
+  const invite = (token, created, days, email = '') => S.createInvitation(state, { adminId: ADMIN, email, days, date: created, token }).invitation;
+  const reward = (businessId, name, points, category, createdAt) => state.rewards.push({
+    id: S.nextId(state, 'rewards'), businessId, name, description: '', category, points, stock: null, image: null,
+    validFrom: null, validTo: null, status: 'activa', featured: true, createdAt: iso(createdAt),
+  });
+
+  // --- Negocios históricos: invitación utilizada + solicitud aprobada ---
+  state.businesses.filter((b) => b.status === 'activo').forEach((b, i) => {
+    const created = new Date(b.createdAt);
+    const inv = invite(`demo-historico-${b.slug}`, hour(created, -48), 7);
+    Object.assign(inv, { status: 'utilizada', usedAt: iso(created) });
+    const owner = state.businessStaff.find((x) => x.businessId === b.id && x.role === 'owner');
+    const req = {
+      id: S.nextId(state, 'businessRequests'), invitationId: inv.id, userId: owner.userId, businessId: b.id,
+      createdAt: iso(created), submittedAt: iso(hour(created, 3)), status: 'aprobada', reviewerId: ADMIN,
+      reviewedAt: iso(hour(created, 20 + i)), reason: 'Datos y configuración completos.',
+    };
+    state.businessRequests.push(req);
+    S.audit(state, { adminId: ADMIN, action: 'aprobar_negocio', businessId: b.id, requestId: req.id, detail: req.reason, date: req.reviewedAt });
+  });
+
+  // --- Librería del Sur: aprobada y luego suspendida ---
+  invite('demo-libreria', ago(64, 10, 0), 7);
+  const lib = S.registerBusinessWithInvitation(state, {
+    token: 'demo-libreria', firstName: 'Ramiro', lastName: 'Sosa', email: 'libreria@demo.com',
+    phone: '381 555-0400', password: 'demo1234', businessName: 'Librería del Sur', category: 'libreria', date: ago(62, 11, 0),
+  });
+  Object.assign(lib.business, { city: 'San Miguel de Tucumán', address: 'Laprida 220', phone: '381 555-0400', email: 'hola@libreriadelsur.demo', logoIcon: 'book-open' });
+  reward(lib.business.id, 'Señalador de regalo', 100, 'general', ago(61, 10, 0));
+  S.submitForReview(state, { businessId: lib.business.id, date: ago(61, 12, 0) });
+  S.reviewRequest(state, { adminId: ADMIN, requestId: lib.request.id, approve: true, reason: 'Todo en orden.', date: ago(60, 9, 30) });
+  S.catchUpPeriods(state, lib.business, ago(6, 10, 0));
+  S.changeBusinessStatus(state, {
+    adminId: ADMIN, businessId: lib.business.id, action: 'suspender', date: ago(6, 10, 15),
+    reason: 'Reclamos de clientes por canjes no entregados. Se reactiva cuando el negocio regularice las entregas pendientes.',
+  });
+
+  // --- Kiosco Avenida: solicitud rechazada ---
+  invite('demo-kiosco', ago(21, 9, 0), 7);
+  const kio = S.registerBusinessWithInvitation(state, {
+    token: 'demo-kiosco', firstName: 'Marcos', lastName: 'Ibarra', email: 'kiosco@demo.com',
+    phone: '381 555-0500', password: 'demo1234', businessName: 'Kiosco Avenida', category: 'almacen', date: ago(19, 18, 0),
+  });
+  reward(kio.business.id, 'Alfajor de regalo', 150, 'snacks', ago(18, 10, 0));
+  S.submitForReview(state, { businessId: kio.business.id, date: ago(18, 11, 0) });
+  S.reviewRequest(state, {
+    adminId: ADMIN, requestId: kio.request.id, approve: false, date: ago(16, 9, 45),
+    reason: 'Faltan la dirección del local y un teléfono de contacto. Completalos en Configuración → Negocio y volvé a enviar la solicitud.',
+  });
+
+  // --- Panadería La Espiga: solicitud enviada, esperando revisión ---
+  invite('demo-panaderia', ago(10, 9, 0), 14, 'panaderia@demo.com');
+  const pan = S.registerBusinessWithInvitation(state, {
+    token: 'demo-panaderia', firstName: 'Julián', lastName: 'Ortiz', email: 'panaderia@demo.com',
+    phone: '381 555-0600', password: 'demo1234', businessName: 'Panadería La Espiga', category: 'panaderia', date: ago(8, 17, 30),
+  });
+  Object.assign(pan.business, {
+    description: 'Pan de masa madre, facturas y tortas por encargo.', city: 'Yerba Buena', address: 'Av. Aconquija 1450',
+    phone: '381 555-0600', email: 'hola@laespiga.demo', logoIcon: 'croissant', paletteId: 'terracota', paletteVariant: 'mostaza',
+  });
+  reward(pan.business.id, '6 facturas de regalo', 300, 'panaderia', ago(8, 18, 0));
+  reward(pan.business.id, 'Pan de masa madre', 450, 'panaderia', ago(8, 18, 5));
+  pan.business.onboarding = { completed: true, dismissed: true, steps: {} };
+  S.submitForReview(state, { businessId: pan.business.id, date: ago(1, 20, 10) });
+
+  // --- Sofía: se registró ayer y está configurando (en preparación) ---
+  invite('demo-sofia', ago(3, 11, 0), 7, 'nuevo@demo.com');
+  S.registerBusinessWithInvitation(state, {
+    token: 'demo-sofia', email: 'nuevo@demo.com', password: 'demo1234', businessName: 'Almacén Doña Rosa', category: 'almacen', date: ago(1, 10, 0),
+  });
+
+  // --- Invitaciones sueltas para probar cada estado ---
+  invite('invitacion-vencida', ago(20, 9, 0), 7, 'heladeria@demo.com');
+  const revoked = invite('invitacion-revocada', ago(14, 9, 0), 14, 'gimnasio@demo.com');
+  S.revokeInvitation(state, { adminId: ADMIN, invitationId: revoked.id, date: ago(13, 16, 0) });
+  invite('invitacion-demo', ago(0.2, 9, 0), 30);
+
+  // La auditoría queda en orden cronológico
+  state.platformAudit.sort((a, b) => new Date(a.date) - new Date(b.date)).forEach((a, i) => { a.id = i + 1; });
+}
+
